@@ -25,6 +25,7 @@
         <module>morphia</module>
         <module>comm</module>
         <module>kafka</module>
+        <module>lucene</module>
     </modules>
 
     <build>

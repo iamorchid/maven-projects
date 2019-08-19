@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.regex.Pattern;
 
 public class KafkaReader {
 
@@ -29,29 +30,6 @@ public class KafkaReader {
         KafkaConsumer consumer = new KafkaConsumer<>(kafkaProps);
 
 
-        final List<TopicPartition> partitions = new LinkedList<>();
-
-        consumer.subscribe(Arrays.asList("iot_mqtt_measurepoint_beta"), new ConsumerRebalanceListener() {
-            @Override
-            public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
-                System.out.println("onPartitionsRevoked: " + partitions);
-            }
-
-            @Override
-            public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
-                System.out.println("onPartitionsAssigned: " + partitions);
-                for(TopicPartition partition : partitions) {
-                    if (partition.partition() == 0) {
-                        consumer.seek(partition, 545410480);
-                    } else if (partition.partition() == 1) {
-                        consumer.seek(partition, 238393002);
-                    }
-
-                    partitions.add(partition);
-                }
-            }
-        });
-
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         BlockingQueue<ConsumerRecord<String, String>> queue = new LinkedBlockingQueue<>();
@@ -61,20 +39,46 @@ public class KafkaReader {
             while(true) {
                 try {
                     ConsumerRecord<String, String> record = queue.take();
-                    RuleEngineMsg msg = gson.fromJson(record.value(), RuleEngineMsg.class);
-                    if (Objects.equals(msg.getOrgId(), "o15475450989191")) {
-                        Map<String, Object> payload = (Map<String, Object>)msg.getPayload();
-                        if (Objects.equals("EGCAf4Ar", payload.get("assetId"))) {
-                            double obj = (Double)payload.get("time");
-                            System.out.println(msg.getPayload() + ", local-time: " + format.format(new Date(((long)obj))));
-                        }
-                    }
+                    System.out.println(record.value());
+//                    RuleEngineMsg msg = gson.fromJson(record.value(), RuleEngineMsg.class);
+//                    if (Objects.equals(msg.getOrgId(), "o15475450989191")) {
+//                        Map<String, Object> payload = (Map<String, Object>)msg.getPayload();
+//                        if (Objects.equals("EGCAf4Ar", payload.get("assetId"))) {
+//                            double obj = (Double)payload.get("time");
+//                            System.out.println(msg.getPayload() + ", local-time: " + format.format(new Date(((long)obj))));
+//                        }
+//                    }
                 } catch (Exception e) {
                     e.getMessage();
                 }
             }
         });
         thread.start();
+
+
+        final List<TopicPartition> partitions = new LinkedList<>();
+
+//        String topic = "MEASURE_POINT_ORIGIN_o15475450989191";
+//        consumer.subscribe(Arrays.asList(topic), new ConsumerRebalanceListener() {
+        consumer.subscribe(Pattern.compile("MEASURE_POINT_CAL_(?!OFFLINE).*"), new ConsumerRebalanceListener() {
+            @Override
+            public void onPartitionsRevoked(Collection<TopicPartition> revokedPartitions) {
+                System.out.println("onPartitionsRevoked: " + revokedPartitions);
+            }
+
+            @Override
+            public void onPartitionsAssigned(Collection<TopicPartition> assignedPartitions) {
+                for(TopicPartition partition : assignedPartitions) {
+                    System.out.println("onPartitionsAssigned: " + partition);
+//                    if (partition.partition() == 0) {
+//                        consumer.seek(partition, 125_332_000);
+//                    }
+                    partitions.add(partition);
+                }
+            }
+        });
+
+
 
         while(true) {
             ConsumerRecords<String, String> result = consumer.poll(Duration.ofMillis(200));
@@ -84,14 +88,6 @@ public class KafkaReader {
                 for (ConsumerRecord<String, String> record : result) {
                     queue.add(record);
                 }
-            }
-
-            if (queue.isEmpty()) {
-                consumer.resume(partitions);
-                paused = false;
-            } else if (!paused) {
-                consumer.pause(partitions);
-                paused = true;
             }
         }
     }
