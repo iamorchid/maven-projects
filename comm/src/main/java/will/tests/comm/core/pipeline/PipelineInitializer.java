@@ -1,4 +1,4 @@
-package will.tests.comm.core;
+package will.tests.comm.core.pipeline;
 
 import io.netty.channel.ChannelPipeline;
 

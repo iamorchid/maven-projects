@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package will.tests.comm.protocol.broker;
+option java_package = "will.tests.comm.protocol.broker";
+option java_outer_classname = "BrokerMessageWrapper";
+
+message BrokerMessage {
+
+    MessageType messageType = 1;
+
+    // Defines the broker from which the message is from
+    string sourceBroker = 2;
+
+    // Defines the broker to whom the message is sent
+    string targetBroker = 3;
+
+    oneof Pack {
+        DisconnectPack disconnectMsg = 4;
+        DownstreamPack downstreamMsg = 5;
+    }
+}
+
+enum MessageType {
+    DISCONNECT = 0;
+    DOWNSTREAM = 1;
+}
+
+message DisconnectPack {
+    string sessionId = 1;
+    string productKey = 2;
+    string deviceKey = 3;
+}
+
+message DownstreamPack {
+    string content = 1;
+}

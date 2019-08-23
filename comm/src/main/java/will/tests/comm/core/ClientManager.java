@@ -6,6 +6,7 @@ import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.Promise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import will.tests.comm.core.pipeline.PipelineInitializer;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -27,11 +28,30 @@ public class ClientManager extends ChannelManager<Channel> {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
                         pipelineInit.init(ch.pipeline());
+
+                        ch.pipeline().addFirst(new ChannelInboundHandlerAdapter() {
+                            @Override
+                            public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+                                LOG.info("channel {} became inactive", ch);
+                                super.channelInactive(ctx);
+                            }
+                        });
                     }
                 })
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .option(ChannelOption.SO_KEEPALIVE, true);
+    }
+
+    public void shutdown() {
+        clients.values().forEach(channel -> {
+            try {
+                channel.close().sync();
+            } catch (Exception e) {
+                // ignore this
+            }
+        });
+        context.getLoopGroup().shutdownGracefully();
     }
 
     public void closeEndpoint(Endpoint address) {

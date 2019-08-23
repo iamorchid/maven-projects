@@ -9,7 +9,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import will.tests.comm.core.PipelineInitializer;
+import will.tests.comm.core.pipeline.PipelineInitializer;
 
 public class ClientPipelineInitializer implements PipelineInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(ClientPipelineInitializer.class);

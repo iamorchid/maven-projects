@@ -34,5 +34,7 @@ public class Client {
         }
 
         manager.closeEndpoint(address);
+
+        manager.shutdown();
     }
 }
