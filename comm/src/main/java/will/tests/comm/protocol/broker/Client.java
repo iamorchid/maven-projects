@@ -21,7 +21,7 @@ public class Client {
         sendMessage(manager, address);
 
         try {
-            Thread.sleep(5000);
+            Thread.sleep(10000);
         } catch (Exception e) {
             //
         }
@@ -32,7 +32,7 @@ public class Client {
         sendMessage(manager, address);
 
         try {
-            Thread.sleep(5000);
+            Thread.sleep(10000);
         } catch (Exception e) {
             //
         }
@@ -44,7 +44,7 @@ public class Client {
 
 
     private static void sendMessage(ClientManager manager, Endpoint address) {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             BrokerMessage.Builder builder = BrokerMessage.newBuilder()
                     .setMessageType(MessageType.DISCONNECT)
                     .setSource("source")
@@ -53,29 +53,32 @@ public class Client {
             if (i % 2 == 0) {
                 builder.setDisconnectMsg(
                         DisconnectPack.newBuilder()
-                                .setDeviceKey("deviceKey")
-                                .setProductKey("productKey")
+                                .setDeviceKey("deviceKey: " + i)
+                                .setProductKey("productKey: " + i)
                                 .build()
                 );
             } else {
                 builder.setDownstreamMsg(DownstreamPack.newBuilder()
-                        .setContent("{\"json\": \"test\"}")
+                        .setContent("test: " + i)
                         .build());
             }
 
-            manager.sendMessage(address, builder.build()).addListener(new GenericFutureListener<Future<? super Boolean>>() {
-                @Override
-                public void operationComplete(Future<? super Boolean> future) throws Exception {
-                    if (future.cause() == null) {
-                        LOG.info("sent message");
-                    } else {
-                        LOG.info("failed to send message: {}", future.cause().getMessage());
+
+            new Thread(() -> {
+                manager.sendMessage(address, builder.build()).addListener(new GenericFutureListener<Future<? super Boolean>>() {
+                    @Override
+                    public void operationComplete(Future<? super Boolean> future) throws Exception {
+                        if (future.cause() == null) {
+                            LOG.info("sent message");
+                        } else {
+                            LOG.info("failed to send message: {}", future.cause().getMessage());
+                        }
                     }
-                }
-            });
+                });
+            }).start();
 
 //            try {
-//                Thread.sleep(5000);
+//                Thread.sleep(10000);
 //            } catch (Exception e) {
 //                //
 //            }

@@ -44,8 +44,12 @@ public class ClientManager extends ChannelManager<Channel> {
                                 super.channelInactive(ctx);
 
                                 Endpoint endpoint = ctx.channel().attr(ATTR_ENDPOINT).get();
-                                LOG.info("Endpoint {} became inactive", endpoint);
-                                clients.remove(endpoint);
+
+                                // This could happen if we re-use the existing channel.
+                                if (endpoint != null) {
+                                    LOG.info("Endpoint {} became inactive", endpoint);
+                                    clients.remove(endpoint);
+                                }
                             }
                         });
                     }
@@ -97,18 +101,7 @@ public class ClientManager extends ChannelManager<Channel> {
             future.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture connFuture) {
-                    Channel channel;
-                    if (connFuture.cause() != null) {
-                        /**
-                         * Someone could already bind the address for us. For more details, pls
-                         * refer to {@link ClientManager#createChannel(Endpoint)}. It loos a bit
-                         * ugly as we are handling duplicated logic here.
-                         */
-                        channel = clients.getOrDefault(address, null);
-                    } else {
-                        channel = connFuture.channel();
-                    }
-
+                    Channel channel = clients.get(address);
                     if (channel == null) {
                         if (connFuture.cause() == null) {
                             LOG.error("[BUG] channel is null but no exception caused is not defined");
@@ -150,15 +143,22 @@ public class ClientManager extends ChannelManager<Channel> {
                 Channel channel;
                 if (connFuture.cause() != null) {
                     // Someone could already bind the address for us
-                    channel = clients.getOrDefault(address, null);
+                    channel = clients.get(address);
                     if (channel == null) {
                         LOG.error("failed to create new channel for {}", address, connFuture.cause());
                     } else {
-                        LOG.warn("would reuse the already connected channel {} for {}", channel, address);
+                        LOG.warn("would reuse the already connected channel {} for {} upon current connect error",
+                                channel, address, connFuture.cause());
                     }
                 } else {
-                    LOG.info("successfully created new channel for {}", address);
-                    channel = connFuture.channel();
+                    LOG.info("successfully created new channel {} for {}", connFuture.channel(), address);
+                    channel = clients.computeIfAbsent(address, addr -> connFuture.channel());
+                    if (channel != null && channel != connFuture.channel()) {
+                        // We should re-use the existing channel
+                        LOG.warn("close the new channel {} since we have an existing one {} for {}",
+                                connFuture.channel(), channel, address);
+                        connFuture.channel().close();
+                    }
                 }
 
                 if (channel != null) {
