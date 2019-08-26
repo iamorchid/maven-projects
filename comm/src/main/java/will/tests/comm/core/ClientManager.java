@@ -13,6 +13,11 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Utility class that manages all local client channels.
+ *
+ * @author jian.zhang4
+ */
 public class ClientManager extends ChannelManager<Channel> {
     private static final Logger LOG = LoggerFactory.getLogger(ClientManager.class);
 
@@ -83,24 +88,36 @@ public class ClientManager extends ChannelManager<Channel> {
         final DefaultPromise<Boolean> promise = new DefaultPromise<>(context.getLoopGroup().next());
 
         Channel channel = clients.get(address);
-        if (channel == null || !channel.isActive()) {
-            if (channel != null) {
-                LOG.warn("close inactive channel {} for address {}", channel, address);
-                channel.close();
-            }
-
+        if (channel == null) {
             final ChannelFuture future = pendingClients.computeIfAbsent(address, endp -> {
-                LOG.info("Now create new channel for {}", endp);
+                LOG.info("Now create new channel for endpoint {}", endp);
                 return createChannel(endp);
             });
 
             future.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture connFuture) {
+                    Channel channel;
                     if (connFuture.cause() != null) {
-                        promise.setFailure(connFuture.cause());
+                        /**
+                         * Someone could already bind the address for us. For more details, pls
+                         * refer to {@link ClientManager#createChannel(Endpoint)}. It loos a bit
+                         * ugly as we are handling duplicated logic here.
+                         */
+                        channel = clients.getOrDefault(address, null);
                     } else {
-                        doSendMessage(connFuture.channel(), data, promise);
+                        channel = connFuture.channel();
+                    }
+
+                    if (channel == null) {
+                        if (connFuture.cause() == null) {
+                            LOG.error("[BUG] channel is null but no exception caused is not defined");
+                            promise.setFailure(new IllegalStateException("[BUG] failure cause expected"));
+                        } else {
+                            promise.setFailure(connFuture.cause());
+                        }
+                    } else {
+                        doSendMessage(channel, data, promise);
                     }
                 }
             });
@@ -130,16 +147,14 @@ public class ClientManager extends ChannelManager<Channel> {
         future.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture connFuture) {
-                pendingClients.remove(address);
-
                 Channel channel;
                 if (connFuture.cause() != null) {
                     // Someone could already bind the address for us
                     channel = clients.getOrDefault(address, null);
-                    if (channel != null) {
-                        LOG.warn("reuse already bound channel {} for {}", channel, address);
-                    } else {
+                    if (channel == null) {
                         LOG.error("failed to create new channel for {}", address, connFuture.cause());
+                    } else {
+                        LOG.warn("would reuse the already connected channel {} for {}", channel, address);
                     }
                 } else {
                     LOG.info("successfully created new channel for {}", address);
@@ -147,9 +162,12 @@ public class ClientManager extends ChannelManager<Channel> {
                 }
 
                 if (channel != null) {
-                    connFuture.channel().attr(ATTR_ENDPOINT).set(address);
-                    clients.put(address, connFuture.channel());
+                    channel.attr(ATTR_ENDPOINT).set(address);
+                    clients.put(address, channel);
                 }
+
+                // We need to handle this after we populate clients
+                pendingClients.remove(address);
             }
         });
 
