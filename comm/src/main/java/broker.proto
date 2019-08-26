@@ -8,11 +8,11 @@ message BrokerMessage {
 
     MessageType messageType = 1;
 
-    // Defines the broker from which the message is from
-    string sourceBroker = 2;
+    // Defines the source broker from which the message is from
+    string source = 2;
 
-    // Defines the broker to whom the message is sent
-    string targetBroker = 3;
+    // Defines the target broker to whom the message is sent
+    string target = 3;
 
     oneof Pack {
         DisconnectPack disconnectMsg = 4;

@@ -127,39 +127,39 @@ public final class BrokerMessageWrapper {
 
     /**
      * <pre>
-     * Defines the broker from which the message is from
+     * Defines the source broker from which the message is from
      * </pre>
      *
-     * <code>string sourceBroker = 2;</code>
+     * <code>string source = 2;</code>
      */
-    java.lang.String getSourceBroker();
+    java.lang.String getSource();
     /**
      * <pre>
-     * Defines the broker from which the message is from
+     * Defines the source broker from which the message is from
      * </pre>
      *
-     * <code>string sourceBroker = 2;</code>
+     * <code>string source = 2;</code>
      */
     com.google.protobuf.ByteString
-        getSourceBrokerBytes();
+        getSourceBytes();
 
     /**
      * <pre>
-     * Defines the broker to whom the message is sent
+     * Defines the target broker to whom the message is sent
      * </pre>
      *
-     * <code>string targetBroker = 3;</code>
+     * <code>string target = 3;</code>
      */
-    java.lang.String getTargetBroker();
+    java.lang.String getTarget();
     /**
      * <pre>
-     * Defines the broker to whom the message is sent
+     * Defines the target broker to whom the message is sent
      * </pre>
      *
-     * <code>string targetBroker = 3;</code>
+     * <code>string target = 3;</code>
      */
     com.google.protobuf.ByteString
-        getTargetBrokerBytes();
+        getTargetBytes();
 
     /**
      * <code>.will.tests.comm.protocol.broker.DisconnectPack disconnectMsg = 4;</code>
@@ -203,8 +203,8 @@ public final class BrokerMessageWrapper {
     }
     private BrokerMessage() {
       messageType_ = 0;
-      sourceBroker_ = "";
-      targetBroker_ = "";
+      source_ = "";
+      target_ = "";
     }
 
     @java.lang.Override
@@ -246,13 +246,13 @@ public final class BrokerMessageWrapper {
             case 18: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              sourceBroker_ = s;
+              source_ = s;
               break;
             }
             case 26: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              targetBroker_ = s;
+              target_ = s;
               break;
             }
             case 34: {
@@ -370,84 +370,84 @@ public final class BrokerMessageWrapper {
       return result == null ? will.tests.comm.protocol.broker.BrokerMessageWrapper.MessageType.UNRECOGNIZED : result;
     }
 
-    public static final int SOURCEBROKER_FIELD_NUMBER = 2;
-    private volatile java.lang.Object sourceBroker_;
+    public static final int SOURCE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object source_;
     /**
      * <pre>
-     * Defines the broker from which the message is from
+     * Defines the source broker from which the message is from
      * </pre>
      *
-     * <code>string sourceBroker = 2;</code>
+     * <code>string source = 2;</code>
      */
-    public java.lang.String getSourceBroker() {
-      java.lang.Object ref = sourceBroker_;
+    public java.lang.String getSource() {
+      java.lang.Object ref = source_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        sourceBroker_ = s;
+        source_ = s;
         return s;
       }
     }
     /**
      * <pre>
-     * Defines the broker from which the message is from
+     * Defines the source broker from which the message is from
      * </pre>
      *
-     * <code>string sourceBroker = 2;</code>
+     * <code>string source = 2;</code>
      */
     public com.google.protobuf.ByteString
-        getSourceBrokerBytes() {
-      java.lang.Object ref = sourceBroker_;
+        getSourceBytes() {
+      java.lang.Object ref = source_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        sourceBroker_ = b;
+        source_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
 
-    public static final int TARGETBROKER_FIELD_NUMBER = 3;
-    private volatile java.lang.Object targetBroker_;
+    public static final int TARGET_FIELD_NUMBER = 3;
+    private volatile java.lang.Object target_;
     /**
      * <pre>
-     * Defines the broker to whom the message is sent
+     * Defines the target broker to whom the message is sent
      * </pre>
      *
-     * <code>string targetBroker = 3;</code>
+     * <code>string target = 3;</code>
      */
-    public java.lang.String getTargetBroker() {
-      java.lang.Object ref = targetBroker_;
+    public java.lang.String getTarget() {
+      java.lang.Object ref = target_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        targetBroker_ = s;
+        target_ = s;
         return s;
       }
     }
     /**
      * <pre>
-     * Defines the broker to whom the message is sent
+     * Defines the target broker to whom the message is sent
      * </pre>
      *
-     * <code>string targetBroker = 3;</code>
+     * <code>string target = 3;</code>
      */
     public com.google.protobuf.ByteString
-        getTargetBrokerBytes() {
-      java.lang.Object ref = targetBroker_;
+        getTargetBytes() {
+      java.lang.Object ref = target_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        targetBroker_ = b;
+        target_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -523,11 +523,11 @@ public final class BrokerMessageWrapper {
       if (messageType_ != will.tests.comm.protocol.broker.BrokerMessageWrapper.MessageType.DISCONNECT.getNumber()) {
         output.writeEnum(1, messageType_);
       }
-      if (!getSourceBrokerBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, sourceBroker_);
+      if (!getSourceBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, source_);
       }
-      if (!getTargetBrokerBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, targetBroker_);
+      if (!getTargetBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, target_);
       }
       if (packCase_ == 4) {
         output.writeMessage(4, (will.tests.comm.protocol.broker.BrokerMessageWrapper.DisconnectPack) pack_);
@@ -548,11 +548,11 @@ public final class BrokerMessageWrapper {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, messageType_);
       }
-      if (!getSourceBrokerBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, sourceBroker_);
+      if (!getSourceBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, source_);
       }
-      if (!getTargetBrokerBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, targetBroker_);
+      if (!getTargetBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, target_);
       }
       if (packCase_ == 4) {
         size += com.google.protobuf.CodedOutputStream
@@ -578,10 +578,10 @@ public final class BrokerMessageWrapper {
       will.tests.comm.protocol.broker.BrokerMessageWrapper.BrokerMessage other = (will.tests.comm.protocol.broker.BrokerMessageWrapper.BrokerMessage) obj;
 
       if (messageType_ != other.messageType_) return false;
-      if (!getSourceBroker()
-          .equals(other.getSourceBroker())) return false;
-      if (!getTargetBroker()
-          .equals(other.getTargetBroker())) return false;
+      if (!getSource()
+          .equals(other.getSource())) return false;
+      if (!getTarget()
+          .equals(other.getTarget())) return false;
       if (!getPackCase().equals(other.getPackCase())) return false;
       switch (packCase_) {
         case 4:
@@ -608,10 +608,10 @@ public final class BrokerMessageWrapper {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + MESSAGETYPE_FIELD_NUMBER;
       hash = (53 * hash) + messageType_;
-      hash = (37 * hash) + SOURCEBROKER_FIELD_NUMBER;
-      hash = (53 * hash) + getSourceBroker().hashCode();
-      hash = (37 * hash) + TARGETBROKER_FIELD_NUMBER;
-      hash = (53 * hash) + getTargetBroker().hashCode();
+      hash = (37 * hash) + SOURCE_FIELD_NUMBER;
+      hash = (53 * hash) + getSource().hashCode();
+      hash = (37 * hash) + TARGET_FIELD_NUMBER;
+      hash = (53 * hash) + getTarget().hashCode();
       switch (packCase_) {
         case 4:
           hash = (37 * hash) + DISCONNECTMSG_FIELD_NUMBER;
@@ -759,9 +759,9 @@ public final class BrokerMessageWrapper {
         super.clear();
         messageType_ = 0;
 
-        sourceBroker_ = "";
+        source_ = "";
 
-        targetBroker_ = "";
+        target_ = "";
 
         packCase_ = 0;
         pack_ = null;
@@ -792,8 +792,8 @@ public final class BrokerMessageWrapper {
       public will.tests.comm.protocol.broker.BrokerMessageWrapper.BrokerMessage buildPartial() {
         will.tests.comm.protocol.broker.BrokerMessageWrapper.BrokerMessage result = new will.tests.comm.protocol.broker.BrokerMessageWrapper.BrokerMessage(this);
         result.messageType_ = messageType_;
-        result.sourceBroker_ = sourceBroker_;
-        result.targetBroker_ = targetBroker_;
+        result.source_ = source_;
+        result.target_ = target_;
         if (packCase_ == 4) {
           if (disconnectMsgBuilder_ == null) {
             result.pack_ = pack_;
@@ -860,12 +860,12 @@ public final class BrokerMessageWrapper {
         if (other.messageType_ != 0) {
           setMessageTypeValue(other.getMessageTypeValue());
         }
-        if (!other.getSourceBroker().isEmpty()) {
-          sourceBroker_ = other.sourceBroker_;
+        if (!other.getSource().isEmpty()) {
+          source_ = other.source_;
           onChanged();
         }
-        if (!other.getTargetBroker().isEmpty()) {
-          targetBroker_ = other.targetBroker_;
+        if (!other.getTarget().isEmpty()) {
+          target_ = other.target_;
           onChanged();
         }
         switch (other.getPackCase()) {
@@ -970,21 +970,21 @@ public final class BrokerMessageWrapper {
         return this;
       }
 
-      private java.lang.Object sourceBroker_ = "";
+      private java.lang.Object source_ = "";
       /**
        * <pre>
-       * Defines the broker from which the message is from
+       * Defines the source broker from which the message is from
        * </pre>
        *
-       * <code>string sourceBroker = 2;</code>
+       * <code>string source = 2;</code>
        */
-      public java.lang.String getSourceBroker() {
-        java.lang.Object ref = sourceBroker_;
+      public java.lang.String getSource() {
+        java.lang.Object ref = source_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          sourceBroker_ = s;
+          source_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -992,19 +992,19 @@ public final class BrokerMessageWrapper {
       }
       /**
        * <pre>
-       * Defines the broker from which the message is from
+       * Defines the source broker from which the message is from
        * </pre>
        *
-       * <code>string sourceBroker = 2;</code>
+       * <code>string source = 2;</code>
        */
       public com.google.protobuf.ByteString
-          getSourceBrokerBytes() {
-        java.lang.Object ref = sourceBroker_;
+          getSourceBytes() {
+        java.lang.Object ref = source_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          sourceBroker_ = b;
+          source_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -1012,68 +1012,68 @@ public final class BrokerMessageWrapper {
       }
       /**
        * <pre>
-       * Defines the broker from which the message is from
+       * Defines the source broker from which the message is from
        * </pre>
        *
-       * <code>string sourceBroker = 2;</code>
+       * <code>string source = 2;</code>
        */
-      public Builder setSourceBroker(
+      public Builder setSource(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        sourceBroker_ = value;
+        source_ = value;
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * Defines the broker from which the message is from
+       * Defines the source broker from which the message is from
        * </pre>
        *
-       * <code>string sourceBroker = 2;</code>
+       * <code>string source = 2;</code>
        */
-      public Builder clearSourceBroker() {
+      public Builder clearSource() {
         
-        sourceBroker_ = getDefaultInstance().getSourceBroker();
+        source_ = getDefaultInstance().getSource();
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * Defines the broker from which the message is from
+       * Defines the source broker from which the message is from
        * </pre>
        *
-       * <code>string sourceBroker = 2;</code>
+       * <code>string source = 2;</code>
        */
-      public Builder setSourceBrokerBytes(
+      public Builder setSourceBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        sourceBroker_ = value;
+        source_ = value;
         onChanged();
         return this;
       }
 
-      private java.lang.Object targetBroker_ = "";
+      private java.lang.Object target_ = "";
       /**
        * <pre>
-       * Defines the broker to whom the message is sent
+       * Defines the target broker to whom the message is sent
        * </pre>
        *
-       * <code>string targetBroker = 3;</code>
+       * <code>string target = 3;</code>
        */
-      public java.lang.String getTargetBroker() {
-        java.lang.Object ref = targetBroker_;
+      public java.lang.String getTarget() {
+        java.lang.Object ref = target_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          targetBroker_ = s;
+          target_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1081,19 +1081,19 @@ public final class BrokerMessageWrapper {
       }
       /**
        * <pre>
-       * Defines the broker to whom the message is sent
+       * Defines the target broker to whom the message is sent
        * </pre>
        *
-       * <code>string targetBroker = 3;</code>
+       * <code>string target = 3;</code>
        */
       public com.google.protobuf.ByteString
-          getTargetBrokerBytes() {
-        java.lang.Object ref = targetBroker_;
+          getTargetBytes() {
+        java.lang.Object ref = target_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          targetBroker_ = b;
+          target_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -1101,49 +1101,49 @@ public final class BrokerMessageWrapper {
       }
       /**
        * <pre>
-       * Defines the broker to whom the message is sent
+       * Defines the target broker to whom the message is sent
        * </pre>
        *
-       * <code>string targetBroker = 3;</code>
+       * <code>string target = 3;</code>
        */
-      public Builder setTargetBroker(
+      public Builder setTarget(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        targetBroker_ = value;
+        target_ = value;
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * Defines the broker to whom the message is sent
+       * Defines the target broker to whom the message is sent
        * </pre>
        *
-       * <code>string targetBroker = 3;</code>
+       * <code>string target = 3;</code>
        */
-      public Builder clearTargetBroker() {
+      public Builder clearTarget() {
         
-        targetBroker_ = getDefaultInstance().getTargetBroker();
+        target_ = getDefaultInstance().getTarget();
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * Defines the broker to whom the message is sent
+       * Defines the target broker to whom the message is sent
        * </pre>
        *
-       * <code>string targetBroker = 3;</code>
+       * <code>string target = 3;</code>
        */
-      public Builder setTargetBrokerBytes(
+      public Builder setTargetBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        targetBroker_ = value;
+        target_ = value;
         onChanged();
         return this;
       }
@@ -2881,19 +2881,19 @@ public final class BrokerMessageWrapper {
   static {
     java.lang.String[] descriptorData = {
       "\n\014broker.proto\022\037will.tests.comm.protocol" +
-      ".broker\"\232\002\n\rBrokerMessage\022A\n\013messageType" +
+      ".broker\"\216\002\n\rBrokerMessage\022A\n\013messageType" +
       "\030\001 \001(\0162,.will.tests.comm.protocol.broker" +
-      ".MessageType\022\024\n\014sourceBroker\030\002 \001(\t\022\024\n\014ta" +
-      "rgetBroker\030\003 \001(\t\022H\n\rdisconnectMsg\030\004 \001(\0132" +
-      "/.will.tests.comm.protocol.broker.Discon" +
-      "nectPackH\000\022H\n\rdownstreamMsg\030\005 \001(\0132/.will" +
-      ".tests.comm.protocol.broker.DownstreamPa" +
-      "ckH\000B\006\n\004Pack\"J\n\016DisconnectPack\022\021\n\tsessio" +
-      "nId\030\001 \001(\t\022\022\n\nproductKey\030\002 \001(\t\022\021\n\tdeviceK" +
-      "ey\030\003 \001(\t\"!\n\016DownstreamPack\022\017\n\007content\030\001 " +
-      "\001(\t*-\n\013MessageType\022\016\n\nDISCONNECT\020\000\022\016\n\nDO" +
-      "WNSTREAM\020\001B7\n\037will.tests.comm.protocol.b" +
-      "rokerB\024BrokerMessageWrapperb\006proto3"
+      ".MessageType\022\016\n\006source\030\002 \001(\t\022\016\n\006target\030\003" +
+      " \001(\t\022H\n\rdisconnectMsg\030\004 \001(\0132/.will.tests" +
+      ".comm.protocol.broker.DisconnectPackH\000\022H" +
+      "\n\rdownstreamMsg\030\005 \001(\0132/.will.tests.comm." +
+      "protocol.broker.DownstreamPackH\000B\006\n\004Pack" +
+      "\"J\n\016DisconnectPack\022\021\n\tsessionId\030\001 \001(\t\022\022\n" +
+      "\nproductKey\030\002 \001(\t\022\021\n\tdeviceKey\030\003 \001(\t\"!\n\016" +
+      "DownstreamPack\022\017\n\007content\030\001 \001(\t*-\n\013Messa" +
+      "geType\022\016\n\nDISCONNECT\020\000\022\016\n\nDOWNSTREAM\020\001B7" +
+      "\n\037will.tests.comm.protocol.brokerB\024Broke" +
+      "rMessageWrapperb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -2904,7 +2904,7 @@ public final class BrokerMessageWrapper {
     internal_static_will_tests_comm_protocol_broker_BrokerMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_will_tests_comm_protocol_broker_BrokerMessage_descriptor,
-        new java.lang.String[] { "MessageType", "SourceBroker", "TargetBroker", "DisconnectMsg", "DownstreamMsg", "Pack", });
+        new java.lang.String[] { "MessageType", "Source", "Target", "DisconnectMsg", "DownstreamMsg", "Pack", });
     internal_static_will_tests_comm_protocol_broker_DisconnectPack_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_will_tests_comm_protocol_broker_DisconnectPack_fieldAccessorTable = new
