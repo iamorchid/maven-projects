@@ -8,12 +8,12 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 
 import java.util.function.Supplier;
 
-public class ProtocolBufReadWritePipelineInitializer<T extends ChannelInboundHandler>
-        extends ProtocolBufWriteOnlyPipelineInitializer<T> {
-    private final Supplier<MessageLite> messageLite;
+public class ProtoBufRWPipelineInitializer<T extends ChannelInboundHandler>
+        extends ProtoBufWriteOnlyPipelineInitializer<T> {
+    private final MessageLite messageLite;
     private final Supplier<T> bizHandler;
 
-    public ProtocolBufReadWritePipelineInitializer(Supplier<MessageLite> messageLite, Supplier<T> bizHandler) {
+    public ProtoBufRWPipelineInitializer(MessageLite messageLite, Supplier<T> bizHandler) {
         this.messageLite = messageLite;
         this.bizHandler = bizHandler;
     }
@@ -23,7 +23,7 @@ public class ProtocolBufReadWritePipelineInitializer<T extends ChannelInboundHan
         super.init(pipeline);
 
         pipeline.addLast(new ProtobufVarint32FrameDecoder());
-        pipeline.addLast(new ProtobufDecoder(messageLite.get()));
+        pipeline.addLast(new ProtobufDecoder(messageLite));
         pipeline.addLast(bizHandler.get());
     }
 }

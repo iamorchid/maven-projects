@@ -7,15 +7,15 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import will.tests.comm.core.ServerManager;
-import will.tests.comm.core.pipeline.ProtocolBufReadWritePipelineInitializer;
+import will.tests.comm.core.pipeline.ProtoBufRWPipelineInitializer;
 
 public class Server {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
     public static void main(String[] args) {
         ServerManager manager = new ServerManager(33333, 0,
-                new ProtocolBufReadWritePipelineInitializer<>(
-                        BrokerMessageWrapper.BrokerMessage::getDefaultInstance,
+                new ProtoBufRWPipelineInitializer<>(
+                        BrokerMessageWrapper.BrokerMessage.getDefaultInstance(),
                         () -> new SimpleChannelInboundHandler<BrokerMessageWrapper.BrokerMessage>() {
                             @Override
                             protected void channelRead0(ChannelHandlerContext ctx, BrokerMessageWrapper.BrokerMessage msg) {

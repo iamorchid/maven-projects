@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import will.tests.comm.core.ClientManager;
 import will.tests.comm.core.Endpoint;
-import will.tests.comm.core.pipeline.ProtocolBufWriteOnlyPipelineInitializer;
+import will.tests.comm.core.pipeline.ProtoBufWriteOnlyPipelineInitializer;
 
 import static will.tests.comm.protocol.broker.BrokerMessageWrapper.*;
 
@@ -15,14 +15,40 @@ public class Client {
     private static final Logger LOG = LoggerFactory.getLogger(Client.class);
 
     public static void main(String[] args) {
-        ClientManager manager = new ClientManager(0, new ProtocolBufWriteOnlyPipelineInitializer());
-
+        ClientManager manager = new ClientManager(0, new ProtoBufWriteOnlyPipelineInitializer());
         Endpoint address = new Endpoint("localhost", 33333);
-        for (int i = 0; i < 10; i++) {
+
+        sendMessage(manager, address);
+
+        try {
+            Thread.sleep(5000);
+        } catch (Exception e) {
+            //
+        }
+
+        manager.closeEndpoint(address);
+
+
+        sendMessage(manager, address);
+
+        try {
+            Thread.sleep(5000);
+        } catch (Exception e) {
+            //
+        }
+
+        manager.closeEndpoint(address);
+
+        manager.shutdown();
+    }
+
+
+    private static void sendMessage(ClientManager manager, Endpoint address) {
+        for (int i = 0; i < 3; i++) {
             BrokerMessage.Builder builder = BrokerMessage.newBuilder()
-                   .setMessageType(MessageType.DISCONNECT)
-                   .setSourceBroker("source")
-                   .setTargetBroker("target");
+                    .setMessageType(MessageType.DISCONNECT)
+                    .setSource("source")
+                    .setTarget("target");
 
             if (i % 2 == 0) {
                 builder.setDisconnectMsg(
@@ -40,23 +66,19 @@ public class Client {
             manager.sendMessage(address, builder.build()).addListener(new GenericFutureListener<Future<? super Boolean>>() {
                 @Override
                 public void operationComplete(Future<? super Boolean> future) throws Exception {
-                    if (future.isSuccess()) {
+                    if (future.cause() == null) {
                         LOG.info("sent message");
                     } else {
-                        LOG.info("failed to send message");
+                        LOG.info("failed to send message: {}", future.cause().getMessage());
                     }
                 }
             });
 
-            try {
-                Thread.sleep(5000);
-            } catch (Exception e) {
-                //
-            }
+//            try {
+//                Thread.sleep(5000);
+//            } catch (Exception e) {
+//                //
+//            }
         }
-
-        manager.closeEndpoint(address);
-
-        manager.shutdown();
     }
 }

@@ -5,7 +5,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 
-public class ProtocolBufWriteOnlyPipelineInitializer<T extends ChannelInboundHandler>
+public class ProtoBufWriteOnlyPipelineInitializer<T extends ChannelInboundHandler>
         implements PipelineInitializer {
 
     @Override

@@ -78,6 +78,10 @@ public class CreateIndex {
 
         System.out.println("before reopen: docCount = " + searchIndex(reader, "test", "NRTApi").size());
 
+        // Note that the logic here would flush in-memory buffer into a new segment on disk.
+        // However, this would not cause creating a new commit point (while IndexWriter is
+        // making changes, nothing is visible to any IndexReader searching the index, until
+        // you commit or open a new NRT reader.).
         IndexReader newReader = DirectoryReader.openIfChanged((DirectoryReader)reader, writer);
         if (newReader != null) {
             System.out.println("index changed");
@@ -91,7 +95,7 @@ public class CreateIndex {
         data.put("GEN", String.valueOf(commits.size() + 1));
         writer.setLiveCommitData(data.entrySet());
 
-      writer.commit();
+        writer.commit();
         writer.close();
     }
 
