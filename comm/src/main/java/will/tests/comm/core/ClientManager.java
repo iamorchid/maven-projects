@@ -28,6 +28,10 @@ public class ClientManager extends ChannelManager<Channel> {
     private final Bootstrap bootstrap;
 
     public ClientManager(int nThreads, final PipelineInitializer pipelineInit) {
+        this(nThreads, 5000, pipelineInit);
+    }
+
+    public ClientManager(int nThreads, int connTimeoutMS, final PipelineInitializer pipelineInit) {
         super(NettyContextResolver.createClientContext(true, nThreads));
 
         bootstrap = new Bootstrap()
@@ -56,7 +60,8 @@ public class ClientManager extends ChannelManager<Channel> {
                 })
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.SO_KEEPALIVE, true);
+                .option(ChannelOption.SO_KEEPALIVE, true)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connTimeoutMS);
     }
 
     public void shutdown() {
@@ -101,6 +106,9 @@ public class ClientManager extends ChannelManager<Channel> {
             future.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture connFuture) {
+                    // Set up the channel for the end-point first
+                    setupEndpointChannel(connFuture, address);
+
                     Channel channel = clients.get(address);
                     if (channel == null) {
                         if (connFuture.cause() == null) {
@@ -134,44 +142,48 @@ public class ClientManager extends ChannelManager<Channel> {
         });
     }
 
-    private ChannelFuture createChannel(final Endpoint address) {
-        ChannelFuture future = bootstrap.connect(new InetSocketAddress(address.getHost(), address.getPort()));
+    /**
+     * Be careful about the logic here. It's easy to introduce bugs here.
+     * @param connFuture
+     * @param address
+     */
+    private synchronized void setupEndpointChannel(ChannelFuture connFuture, Endpoint address) {
+        Channel seenChannel = clients.get(address);
 
-        future.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture connFuture) {
-                Channel channel;
-                if (connFuture.cause() != null) {
-                    // Someone could already bind the address for us
-                    channel = clients.get(address);
-                    if (channel == null) {
-                        LOG.error("failed to create new channel for {}", address, connFuture.cause());
-                    } else {
-                        LOG.warn("would reuse the already connected channel {} for {} upon current connect error",
-                                channel, address, connFuture.cause());
-                    }
-                } else {
-                    LOG.info("successfully created new channel {} for {}", connFuture.channel(), address);
-                    channel = clients.computeIfAbsent(address, addr -> connFuture.channel());
-                    if (channel != null && channel != connFuture.channel()) {
-                        // We should re-use the existing channel
-                        LOG.warn("close the new channel {} since we have an existing one {} for {}",
-                                connFuture.channel(), channel, address);
-                        connFuture.channel().close();
-                    }
-                }
-
-                if (channel != null) {
-                    channel.attr(ATTR_ENDPOINT).set(address);
-                    clients.put(address, channel);
-                }
-
-                // We need to handle this after we populate clients
-                pendingClients.remove(address);
+        if (connFuture.cause() != null) {
+            LOG.error("failed to create new channel for {}", address, connFuture.cause());
+            if (seenChannel != null) {
+                LOG.error("would re-use existing channel {} for {}", seenChannel, address);
             }
-        });
+        } else {
+            if (seenChannel == null || seenChannel != connFuture.channel()) {
+                LOG.info("successfully created new channel {} for {}", connFuture.channel(), address);
+            }
 
-        return future;
+            if (seenChannel != null && seenChannel != connFuture.channel()) {
+                // We should re-use the existing channel
+                LOG.warn("close the duplicated channel {} and re-use the channel {} for {}",
+                        connFuture.channel(), seenChannel, address);
+                connFuture.channel().close();
+            }
+        }
+
+        // bind the channel if this is the first channel we see for the endpoint
+        if (seenChannel == null && connFuture.cause() == null) {
+            LOG.info("bind new channel {} to {}", connFuture.channel(), address);
+            connFuture.channel().attr(ATTR_ENDPOINT).set(address);
+            clients.put(address, connFuture.channel());
+        }
+
+        // We need to handle this after we populate clients
+        pendingClients.remove(address);
+    }
+
+    /**
+     * This is only package visible for {@link HostPublicIpResolver}
+     */
+    ChannelFuture createChannel(final Endpoint address) {
+        return bootstrap.connect(new InetSocketAddress(address.getHost(), address.getPort()));
     }
 
 }
