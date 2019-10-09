@@ -26,6 +26,8 @@
         <module>comm</module>
         <module>kafka</module>
         <module>lucene</module>
+        <module>mqtt-client</module>
+        <module>quartz</module>
     </modules>
 
     <build>

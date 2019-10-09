@@ -35,8 +35,12 @@ public class NettyContextResolver {
     private static <T extends Channel> NettyContext<T> createContext(boolean tryEpoll, int nThreads, Function<Boolean, Class> func) {
         if (isUsingLinuxAndAMD64() && tryEpoll) {
             try {
+                LOG.info("trying to use epoll for netty in Linux ...");
+
                 EventLoopGroup group = new EpollEventLoopGroup(nThreads);
                 Class<T> channelClass = func.apply(true);
+
+                LOG.info("initialized epoll successfully");
                 return new NettyContext<>(group, channelClass);
             } catch (Throwable e) {
                 LOG.info("failed to init epoll", e);
