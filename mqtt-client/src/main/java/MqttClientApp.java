@@ -16,8 +16,8 @@ import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
 public class MqttClientApp {
-//    private static final Endpoint SERVER = new Endpoint("beta-iot-as-mqtt-cn4.eniot.io", 11883);
-    private static final Endpoint SERVER = new Endpoint("10.27.20.52", 11883);
+    private static final Endpoint SERVER = new Endpoint("beta-iot-as-mqtt-cn4.eniot.io", 11883);
+//    private static final Endpoint SERVER = new Endpoint("10.27.20.52", 11883);
 
     public static void main(String[] args) throws Exception {
         final ClientManager mgr = new ClientManager(0, pipeline -> {
@@ -48,13 +48,13 @@ public class MqttClientApp {
             });
         });
 
-        // 1.0 beta
-        ByteBuf data = getConnMsg(
-                "enos-7zrJzjQCrqf3R9S",
-                "dev01",
-                "oMmI512lia+D9bNMsv8DVgR5MOniIGLJd8dCLvY9a5ngPI1PJ+TLFpCDasg=");
+//        // 1.0 beta
+//        ByteBuf data = getConnMsg(
+//                "enos-7zrJzjQCrqf3R9S",
+//                "dev01",
+//                "oMmI512lia+D9bNMsv8DVgR5MOniIGLJd8dCLvY9a5ngPI1PJ+TLFpCDasg=");
 
-        mgr.sendMessage(SERVER, data).addListener(new GenericFutureListener<Future<? super Boolean>>() {
+        mgr.sendMessage(SERVER, getPublishMsg("/sys/pk/dk/thing/event/measurepoint/post", "dos", 0)).addListener(new GenericFutureListener<Future<? super Boolean>>() {
             @Override
             public void operationComplete(Future<? super Boolean> future) throws Exception {
                 if (future.isSuccess()) {

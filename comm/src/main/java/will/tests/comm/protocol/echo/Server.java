@@ -10,7 +10,7 @@ public class Server {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
     public static void main(String[] args) {
-        ServerManager manager = new ServerManager(33333, 0, new ServerPipelineInitializer());
+        ServerManager manager = new ServerManager(33333, new ServerPipelineInitializer());
         manager.start().addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) {

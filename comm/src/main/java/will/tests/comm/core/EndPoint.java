@@ -1,14 +1,24 @@
 package will.tests.comm.core;
 
+import com.google.common.base.Preconditions;
+
 import java.util.Objects;
 
-public class Endpoint {
+public class EndPoint {
     private final String host;
     private final int port;
 
-    public Endpoint(String host, int port) {
+    public EndPoint(String host, int port) {
         this.host = host;
         this.port = port;
+    }
+
+    public EndPoint(String hostAndPort) {
+        String[] hostPort = hostAndPort.split("[:]");
+        Preconditions.checkArgument(hostPort.length == 2, "invalid host and port: " + hostAndPort);
+
+        this.host = hostPort[0];
+        this.port = Integer.parseInt(hostPort[1]);
     }
 
     public String getHost() {
@@ -23,7 +33,7 @@ public class Endpoint {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Endpoint endpoint = (Endpoint) o;
+        EndPoint endpoint = (EndPoint) o;
         return port == endpoint.port &&
                 Objects.equals(host, endpoint.host);
     }
@@ -35,6 +45,6 @@ public class Endpoint {
 
     @Override
     public String toString() {
-        return "{" + "host='" + host + '\'' + ", port=" + port + '}';
+        return host + ":" + port;
     }
 }

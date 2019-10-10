@@ -5,7 +5,7 @@ import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import will.tests.comm.core.ClientManager;
-import will.tests.comm.core.Endpoint;
+import will.tests.comm.core.EndPoint;
 import will.tests.comm.core.pipeline.ProtoBufWriteOnlyPipelineInitializer;
 
 import static will.tests.comm.protocol.broker.BrokerMessageWrapper.*;
@@ -16,7 +16,7 @@ public class Client {
 
     public static void main(String[] args) {
         ClientManager manager = new ClientManager(0, new ProtoBufWriteOnlyPipelineInitializer());
-        Endpoint address = new Endpoint("localhost", 33333);
+        EndPoint address = new EndPoint("localhost", 33333);
 
         sendMessage(manager, address);
 
@@ -43,7 +43,7 @@ public class Client {
     }
 
 
-    private static void sendMessage(ClientManager manager, Endpoint address) {
+    private static void sendMessage(ClientManager manager, EndPoint address) {
         for (int i = 0; i < 5; i++) {
             BrokerMessage.Builder builder = BrokerMessage.newBuilder()
                     .setMessageType(MessageType.DISCONNECT)

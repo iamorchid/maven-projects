@@ -5,6 +5,7 @@ import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import will.tests.comm.core.context.NettyContextResolver;
 import will.tests.comm.core.pipeline.PipelineInitializer;
 
 public class ServerManager extends ChannelManager<ServerChannel> {
@@ -14,8 +15,12 @@ public class ServerManager extends ChannelManager<ServerChannel> {
     private final int port;
     private Channel serverChannel;
 
-    public ServerManager(int port, int nThreads, final PipelineInitializer childPipelineInit) {
-        super(NettyContextResolver.createServerContext(true, nThreads));
+    public ServerManager(int port, final PipelineInitializer childPipelineInit) {
+        this(port, 0, -1, childPipelineInit);
+    }
+
+    public ServerManager(int port, int bossThreads, int workerThreads, final PipelineInitializer childPipelineInit) {
+        super(NettyContextResolver.createServerContext(bossThreads, workerThreads));
 
         this.bootstrap = new ServerBootstrap()
                 .group(context.getLoopGroup())
@@ -39,8 +44,7 @@ public class ServerManager extends ChannelManager<ServerChannel> {
                 })
                 .option(ChannelOption.SO_BACKLOG, 512)
                 .option(ChannelOption.SO_REUSEADDR, true)
-                .option(ChannelOption.TCP_NODELAY, true)
-                .childOption(ChannelOption.SO_KEEPALIVE, true);
+                .option(ChannelOption.TCP_NODELAY, true);
         this.port = port;
     }
 
@@ -65,6 +69,6 @@ public class ServerManager extends ChannelManager<ServerChannel> {
                 // ignore this
             }
         }
-        context.getLoopGroup().shutdownGracefully();
+        context.shutdown();
     }
 }

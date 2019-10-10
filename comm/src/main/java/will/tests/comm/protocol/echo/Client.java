@@ -5,7 +5,7 @@ import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import will.tests.comm.core.ClientManager;
-import will.tests.comm.core.Endpoint;
+import will.tests.comm.core.EndPoint;
 
 public class Client {
     private static final Logger LOG = LoggerFactory.getLogger(Client.class);
@@ -13,7 +13,7 @@ public class Client {
     public static void main(String[] args) {
         ClientManager manager = new ClientManager(0, new ClientPipelineInitializer());
 
-        Endpoint address = new Endpoint("localhost", 33333);
+        EndPoint address = new EndPoint("localhost", 33333);
         for (int i = 0; i < 10; i++) {
             manager.sendMessage(address, "message seq#" + i).addListener(new GenericFutureListener<Future<? super Boolean>>() {
                 @Override

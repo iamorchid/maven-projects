@@ -7,6 +7,7 @@ import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.Promise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import will.tests.comm.core.context.NettyContextResolver;
 import will.tests.comm.core.pipeline.PipelineInitializer;
 
 import java.net.InetSocketAddress;
@@ -21,10 +22,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientManager extends ChannelManager<Channel> {
     private static final Logger LOG = LoggerFactory.getLogger(ClientManager.class);
 
-    private static final AttributeKey<Endpoint> ATTR_ENDPOINT = AttributeKey.valueOf("ENDPOINT");
+    private static final AttributeKey<EndPoint> ATTR_ENDPOINT = AttributeKey.valueOf("ENDPOINT");
 
-    private final Map<Endpoint, Channel> clients = new ConcurrentHashMap<>();
-    private final Map<Endpoint, ChannelFuture> pendingClients = new ConcurrentHashMap<>();
+    private final Map<EndPoint, Channel> clients = new ConcurrentHashMap<>();
+    private final Map<EndPoint, ChannelFuture> pendingClients = new ConcurrentHashMap<>();
     private final Bootstrap bootstrap;
 
     public ClientManager(int nThreads, final PipelineInitializer pipelineInit) {
@@ -32,7 +33,7 @@ public class ClientManager extends ChannelManager<Channel> {
     }
 
     public ClientManager(int nThreads, int connTimeoutMS, final PipelineInitializer pipelineInit) {
-        super(NettyContextResolver.createClientContext(true, nThreads));
+        super(NettyContextResolver.createClientContext(nThreads));
 
         bootstrap = new Bootstrap()
                 .group(context.getLoopGroup())
@@ -47,7 +48,7 @@ public class ClientManager extends ChannelManager<Channel> {
                             public void channelInactive(ChannelHandlerContext ctx) throws Exception {
                                 super.channelInactive(ctx);
 
-                                Endpoint endpoint = ctx.channel().attr(ATTR_ENDPOINT).get();
+                                EndPoint endpoint = ctx.channel().attr(ATTR_ENDPOINT).get();
 
                                 // This could happen if we re-use the existing channel.
                                 if (endpoint != null) {
@@ -60,7 +61,6 @@ public class ClientManager extends ChannelManager<Channel> {
                 })
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .option(ChannelOption.TCP_NODELAY, true)
-                .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connTimeoutMS);
     }
 
@@ -72,10 +72,10 @@ public class ClientManager extends ChannelManager<Channel> {
                 // ignore this
             }
         });
-        context.getLoopGroup().shutdownGracefully();
+        context.shutdown();
     }
 
-    public void closeEndpoint(Endpoint address) {
+    public void closeEndpoint(EndPoint address) {
         Channel channel = clients.remove(address);
         if (channel == null) {
             LOG.warn("failed to close endpoint {} as it doesn't exist", address);
@@ -93,7 +93,7 @@ public class ClientManager extends ChannelManager<Channel> {
         }
     }
 
-    public Promise<Boolean> sendMessage(Endpoint address, final Object data) {
+    public Promise<Boolean> sendMessage(EndPoint address, final Object data) {
         final DefaultPromise<Boolean> promise = new DefaultPromise<>(context.getLoopGroup().next());
 
         Channel channel = clients.get(address);
@@ -112,7 +112,7 @@ public class ClientManager extends ChannelManager<Channel> {
                     Channel channel = clients.get(address);
                     if (channel == null) {
                         if (connFuture.cause() == null) {
-                            LOG.error("[BUG] channel is null but no exception caused is not defined");
+                            LOG.error("[BUG] channel is null but no exception cause is not defined");
                             promise.setFailure(new IllegalStateException("[BUG] failure cause expected"));
                         } else {
                             promise.setFailure(connFuture.cause());
@@ -147,7 +147,7 @@ public class ClientManager extends ChannelManager<Channel> {
      * @param connFuture
      * @param address
      */
-    private synchronized void setupEndpointChannel(ChannelFuture connFuture, Endpoint address) {
+    private synchronized void setupEndpointChannel(ChannelFuture connFuture, EndPoint address) {
         Channel seenChannel = clients.get(address);
 
         if (connFuture.cause() != null) {
@@ -182,7 +182,7 @@ public class ClientManager extends ChannelManager<Channel> {
     /**
      * This is only package visible for {@link HostPublicIpResolver}
      */
-    ChannelFuture createChannel(final Endpoint address) {
+    ChannelFuture createChannel(final EndPoint address) {
         return bootstrap.connect(new InetSocketAddress(address.getHost(), address.getPort()));
     }
 

@@ -13,7 +13,7 @@ public class Server {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
     public static void main(String[] args) {
-        ServerManager manager = new ServerManager(33333, 0,
+        ServerManager manager = new ServerManager(33333,
                 new ProtoBufRWPipelineInitializer<>(
                         BrokerMessageWrapper.BrokerMessage.getDefaultInstance(),
                         () -> new SimpleChannelInboundHandler<BrokerMessageWrapper.BrokerMessage>() {

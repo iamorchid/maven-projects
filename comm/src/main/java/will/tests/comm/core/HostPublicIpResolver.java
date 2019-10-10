@@ -28,8 +28,8 @@ public class HostPublicIpResolver {
             "Bull.eos-cloud.addr" // redis server list
     );
 
-    public static List<Endpoint> getDefaultPublicServers() {
-        List<Endpoint> r = new LinkedList<>();
+    public static List<EndPoint> getDefaultWellKnownServers() {
+        List<EndPoint> r = new LinkedList<>();
 
         for (String key : DEFAULT_KEYS) {
             String config = LionUtil.getStringValue(key, "");
@@ -44,13 +44,13 @@ public class HostPublicIpResolver {
         return r;
     }
 
-    private static List<Endpoint> parse(String key, String config) {
+    private static List<EndPoint> parse(String key, String config) {
         String[] values = config.split("[,;\\s]");
         if (ArrayUtils.isEmpty(values)) {
             return Collections.emptyList();
         }
 
-        List<Endpoint> r = new LinkedList<>();
+        List<EndPoint> r = new LinkedList<>();
         for(String value : values) {
             if (StringUtils.isBlank(value)) {
                 continue;
@@ -59,7 +59,7 @@ public class HostPublicIpResolver {
             String[] hostPort = value.split("[:]");
             if (ArrayUtils.isNotEmpty(hostPort) && hostPort.length == 2) {
                 try {
-                    r.add(new Endpoint(hostPort[0].trim(), Integer.parseInt(hostPort[1].trim())));
+                    r.add(new EndPoint(hostPort[0].trim(), Integer.parseInt(hostPort[1].trim())));
                 } catch (Exception e) {
                     LOG.error("unable to parse value {} from lion key {}", hostPort, key);
                 }
@@ -71,15 +71,23 @@ public class HostPublicIpResolver {
         return r;
     }
 
+    public static String getPublicIp() {
+        InetAddress address = getPublicIp(getDefaultWellKnownServers());
+        if (address == null) {
+            throw new RuntimeException("failed to resolve public ip");
+        }
+        return address.getHostAddress();
+    }
+
     /**
      * A list of public servers that are used to resolve our local public ip.
      * This is a more reliable way to resolve our local public ip than the method
-     * {@link HostPublicIpResolver#getPublicIp()}.
+     * {@link HostPublicIpResolver#getPublicIpAddr()}.
      *
      * @param publicServers a list of public servers
      * @return null if public ip is not available
      */
-    public static InetAddress getPublicIp(List<Endpoint> publicServers) {
+    public static InetAddress getPublicIp(List<EndPoint> publicServers) {
 
         ClientManager manager = new ClientManager(1, 3000, pipeline -> {
             // we don't need this actually
@@ -88,7 +96,7 @@ public class HostPublicIpResolver {
         final MutableObject obj = new MutableObject();
 
         try {
-            for (Endpoint server : publicServers) {
+            for (EndPoint server : publicServers) {
                 final CountDownLatch latch = new CountDownLatch(1);
                 manager.createChannel(server).addListener(
                         new ChannelFutureListener() {
@@ -122,7 +130,7 @@ public class HostPublicIpResolver {
             return (InetAddress)obj.getValue();
         }
 
-        return getPublicIp();
+        return getPublicIpAddr();
     }
 
 
@@ -132,7 +140,7 @@ public class HostPublicIpResolver {
      *
      * @return null if public ip is not available
      */
-    public static InetAddress getPublicIp() {
+    public static InetAddress getPublicIpAddr() {
         try {
             // Traversal Network interface to get the first non-loopback and non-private address
             Enumeration<NetworkInterface> enumeration = NetworkInterface.getNetworkInterfaces();
@@ -159,7 +167,7 @@ public class HostPublicIpResolver {
 
             // prefer ipv4
             for (InetAddress ip : ipv4Result) {
-                if (ip.getHostAddress().startsWith("127.0") || ip.getHostAddress().startsWith("192.168")) {
+                if (ip.getHostAddress().startsWith("127.") || ip.getHostAddress().startsWith("192.168")) {
                     continue;
                 }
                 return ip;
@@ -187,6 +195,8 @@ public class HostPublicIpResolver {
         System.out.println(parse("Camel.kafka-common", "kafka9001.eniot.io:9092,kafka9002.eniot.io:9092"));
         System.out.println(parse("Camel.kafka-common", "kafka9001.eniot.io:9092   kafka9002.eniot.io:9092"));
 
-        System.out.println(getDefaultPublicServers());
+        System.out.println(getDefaultWellKnownServers());
+
+        System.out.println(getPublicIp(getDefaultWellKnownServers()));
     }
 }
