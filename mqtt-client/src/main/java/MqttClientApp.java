@@ -12,6 +12,7 @@ import will.tests.comm.core.ClientManager;
 import will.tests.comm.core.Endpoint;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
 public class MqttClientApp {
@@ -65,6 +66,20 @@ public class MqttClientApp {
         });
 
         System.in.read();
+
+
+        mgr.sendMessage(SERVER, getDisconnMsg()).addListener(new GenericFutureListener<Future<? super Boolean>>() {
+            @Override
+            public void operationComplete(Future<? super Boolean> future) throws Exception {
+                if (future.isSuccess()) {
+                    System.out.println("sent disconnect message");
+                } else {
+                    System.out.println("failed to send disconnect message");
+                }
+            }
+        });
+        TimeUnit.SECONDS.sleep(3);
+
         mgr.shutdown();
     }
 
@@ -83,8 +98,8 @@ public class MqttClientApp {
         variableBuf.writeByte(0xC0);
 
         // Keep Alive (60s)
-        variableBuf.writeByte(0x00);
-        variableBuf.writeByte(0x3C);
+        variableBuf.writeByte(0xFF);
+        variableBuf.writeByte(0xFF);
 
         // Client ID
         populateString(variableBuf, clientId);
@@ -125,6 +140,14 @@ public class MqttClientApp {
         buf.addComponent(true, variableBuf);
 
         return buf;
+    }
+
+    private static ByteBuf getDisconnMsg() {
+        ByteBuf fixedHeader = Unpooled.buffer(16);
+        // header flags
+        fixedHeader.writeByte(14 << 4);
+        fixedHeader.writeByte(0);
+        return fixedHeader;
     }
 
     private static void populateString(ByteBuf buf, String data) {
