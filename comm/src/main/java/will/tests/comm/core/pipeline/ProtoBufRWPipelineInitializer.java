@@ -3,27 +3,23 @@ package will.tests.comm.core.pipeline;
 import com.google.protobuf.MessageLite;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.protobuf.ProtobufDecoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 
 import java.util.function.Supplier;
 
-public class ProtoBufRWPipelineInitializer<T extends ChannelInboundHandler>
-        extends ProtoBufWriteOnlyPipelineInitializer<T> {
-    private final MessageLite messageLite;
-    private final Supplier<T> bizHandler;
+@SuppressWarnings("unchecked")
+public class ProtoBufRWPipelineInitializer<T extends ChannelInboundHandler> implements PipelineInitializer {
+    private final ProtoBufReadPipelineInitializer readPipeInitializer;
+    private final ProtoBufWritePipelineInitializer writePipeInitializer;
 
     public ProtoBufRWPipelineInitializer(MessageLite messageLite, Supplier<T> bizHandler) {
-        this.messageLite = messageLite;
-        this.bizHandler = bizHandler;
+        readPipeInitializer = new ProtoBufReadPipelineInitializer(messageLite, bizHandler);
+        writePipeInitializer = new ProtoBufWritePipelineInitializer();
     }
 
     @Override
     public void init(ChannelPipeline pipeline) throws Exception {
-        super.init(pipeline);
-
-        pipeline.addLast(new ProtobufVarint32FrameDecoder());
-        pipeline.addLast(new ProtobufDecoder(messageLite));
-        pipeline.addLast(bizHandler.get());
+        readPipeInitializer.init(pipeline);
+        writePipeInitializer.init(pipeline);
     }
+
 }

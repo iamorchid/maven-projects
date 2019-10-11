@@ -46,8 +46,6 @@ public class ClientManager extends ChannelManager<Channel> {
                         ch.pipeline().addFirst(new ChannelInboundHandlerAdapter() {
                             @Override
                             public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-                                super.channelInactive(ctx);
-
                                 EndPoint endpoint = ctx.channel().attr(ATTR_ENDPOINT).get();
 
                                 // This could happen if we re-use the existing channel.
@@ -55,6 +53,9 @@ public class ClientManager extends ChannelManager<Channel> {
                                     LOG.info("Endpoint {} became inactive", endpoint);
                                     clients.remove(endpoint);
                                 }
+
+                                // delegate to super class
+                                super.channelInactive(ctx);
                             }
                         });
                     }
@@ -80,14 +81,11 @@ public class ClientManager extends ChannelManager<Channel> {
         if (channel == null) {
             LOG.warn("failed to close endpoint {} as it doesn't exist", address);
         } else {
-            channel.close().addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture future) {
-                    if (future.cause() == null) {
-                        LOG.info("closed endpoint {}", address);
-                    } else {
-                        LOG.info("failed to close endpoint {}", address, future.cause());
-                    }
+            channel.close().addListener((ChannelFutureListener) future -> {
+                if (future.cause() == null) {
+                    LOG.info("closed endpoint {}", address);
+                } else {
+                    LOG.info("failed to close endpoint {}", address, future.cause());
                 }
             });
         }
@@ -103,23 +101,21 @@ public class ClientManager extends ChannelManager<Channel> {
                 return createChannel(endp);
             });
 
-            future.addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture connFuture) {
-                    // Set up the channel for the end-point first
-                    setupEndpointChannel(connFuture, address);
+            future.addListener((ChannelFutureListener) connFuture -> {
+                // Set up the channel for the end-point first
+                setupEndpointChannel(connFuture, address);
 
-                    Channel channel = clients.get(address);
-                    if (channel == null) {
-                        if (connFuture.cause() == null) {
-                            LOG.error("[BUG] channel is null but no exception cause is not defined");
-                            promise.setFailure(new IllegalStateException("[BUG] failure cause expected"));
-                        } else {
-                            promise.setFailure(connFuture.cause());
-                        }
+                Channel channel1 = clients.get(address);
+                if (channel1 == null) {
+                    if (connFuture.cause() == null) {
+                        LOG.error("[BUG] channel is null but no exception cause is not defined");
+                        promise.setFailure(new IllegalStateException("[BUG] failure cause expected"));
                     } else {
-                        doSendMessage(channel, data, promise);
+                        promise.setFailure(connFuture.cause());
+                        connFuture.channel().close();
                     }
+                } else {
+                    doSendMessage(channel1, data, promise);
                 }
             });
         } else {
@@ -130,20 +126,21 @@ public class ClientManager extends ChannelManager<Channel> {
     }
 
     private void doSendMessage(Channel channel, Object data, final DefaultPromise<Boolean> promise) {
-        channel.writeAndFlush(data).addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture sendFuture) {
-                if (sendFuture.cause() != null) {
-                    promise.setFailure(sendFuture.cause());
-                } else {
-                    promise.setSuccess(Boolean.TRUE);
-                }
+        channel.writeAndFlush(data).addListener((ChannelFutureListener) sendFuture -> {
+            if (sendFuture.cause() != null) {
+                promise.setFailure(sendFuture.cause());
+                sendFuture.channel().close();
+            } else {
+                promise.setSuccess(Boolean.TRUE);
             }
         });
     }
 
     /**
      * Be careful about the logic here. It's easy to introduce bugs here.
+     *
+     * If you want to make any changes here, think twice and ask for others' comments.
+     *
      * @param connFuture
      * @param address
      */
@@ -153,7 +150,7 @@ public class ClientManager extends ChannelManager<Channel> {
         if (connFuture.cause() != null) {
             LOG.error("failed to create new channel for {}", address, connFuture.cause());
             if (seenChannel != null) {
-                LOG.error("would re-use existing channel {} for {}", seenChannel, address);
+                LOG.warn("would re-use existing channel {} for {}", seenChannel, address);
             }
         } else {
             if (seenChannel == null || seenChannel != connFuture.channel()) {
@@ -161,7 +158,7 @@ public class ClientManager extends ChannelManager<Channel> {
             }
 
             if (seenChannel != null && seenChannel != connFuture.channel()) {
-                // We should re-use the existing channel
+                // We should re-use the existing channel and close this newly created channel
                 LOG.warn("close the duplicated channel {} and re-use the channel {} for {}",
                         connFuture.channel(), seenChannel, address);
                 connFuture.channel().close();

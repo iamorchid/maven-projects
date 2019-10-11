@@ -1,4 +1,4 @@
-package will.tests.comm.protocol.broker;
+package will.tests.comm.protocol.broker.cs;
 
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import will.tests.comm.core.ClientManager;
 import will.tests.comm.core.EndPoint;
-import will.tests.comm.core.pipeline.ProtoBufWriteOnlyPipelineInitializer;
+import will.tests.comm.core.pipeline.ProtoBufWritePipelineInitializer;
 
 import static will.tests.comm.protocol.broker.BrokerMessageWrapper.*;
 
@@ -15,7 +15,7 @@ public class Client {
     private static final Logger LOG = LoggerFactory.getLogger(Client.class);
 
     public static void main(String[] args) {
-        ClientManager manager = new ClientManager(0, new ProtoBufWriteOnlyPipelineInitializer());
+        ClientManager manager = new ClientManager(0, new ProtoBufWritePipelineInitializer());
         EndPoint address = new EndPoint("localhost", 33333);
 
         sendMessage(manager, address);

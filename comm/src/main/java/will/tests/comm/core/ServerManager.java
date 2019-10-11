@@ -15,6 +15,8 @@ public class ServerManager extends ChannelManager<ServerChannel> {
     private final int port;
     private Channel serverChannel;
 
+    // Use the same event loop group for both boss and worker. And the group
+    // would have default number of threads assigned (2 * cores).
     public ServerManager(int port, final PipelineInitializer childPipelineInit) {
         this(port, 0, -1, childPipelineInit);
     }
@@ -36,26 +38,22 @@ public class ServerManager extends ChannelManager<ServerChannel> {
                         ch.pipeline().addFirst(new ChannelInboundHandlerAdapter() {
                             @Override
                             public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-                                LOG.info("channel {} became inactive", ch);
+                                LOG.info("client channel {} became inactive", ch);
                                 super.channelInactive(ctx);
                             }
                         });
                     }
                 })
                 .option(ChannelOption.SO_BACKLOG, 512)
-                .option(ChannelOption.SO_REUSEADDR, true)
-                .option(ChannelOption.TCP_NODELAY, true);
+                .option(ChannelOption.SO_REUSEADDR, true);
         this.port = port;
     }
 
     public ChannelFuture start() {
         ChannelFuture future = bootstrap.bind(port);
-        future.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) {
-                if (future.cause() == null) {
-                    serverChannel = future.channel();
-                }
+        future.addListener((ChannelFutureListener) future1 -> {
+            if (future1.cause() == null) {
+                serverChannel = future1.channel();
             }
         });
         return future;
