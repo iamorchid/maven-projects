@@ -58,9 +58,9 @@ public class KafkaReader {
 
         final List<TopicPartition> partitions = new LinkedList<>();
 
-//        String topic = "MEASURE_POINT_ORIGIN_o15475450989191";
-//        consumer.subscribe(Arrays.asList(topic), new ConsumerRebalanceListener() {
-        consumer.subscribe(Pattern.compile("MEASURE_POINT_CAL_(?!OFFLINE).*"), new ConsumerRebalanceListener() {
+        String topic = "MQTT_ALERT_POST_TOPIC";
+        consumer.subscribe(Arrays.asList(topic), new ConsumerRebalanceListener() {
+//        consumer.subscribe(Pattern.compile("MEASURE_POINT_CAL_(?!OFFLINE).*"), new ConsumerRebalanceListener() {
             @Override
             public void onPartitionsRevoked(Collection<TopicPartition> revokedPartitions) {
                 System.out.println("onPartitionsRevoked: " + revokedPartitions);
@@ -70,9 +70,7 @@ public class KafkaReader {
             public void onPartitionsAssigned(Collection<TopicPartition> assignedPartitions) {
                 for(TopicPartition partition : assignedPartitions) {
                     System.out.println("onPartitionsAssigned: " + partition);
-//                    if (partition.partition() == 0) {
-//                        consumer.seek(partition, 125_332_000);
-//                    }
+                    consumer.seek(partition, 0);
                     partitions.add(partition);
                 }
             }

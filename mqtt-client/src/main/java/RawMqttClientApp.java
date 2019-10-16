@@ -3,21 +3,18 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import will.tests.comm.core.ClientManager;
-import will.tests.comm.core.Endpoint;
+import will.tests.comm.core.EndPoint;
 
 import java.nio.charset.StandardCharsets;
-import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
-public class MqttClientApp {
-    private static final Endpoint SERVER = new Endpoint("beta-iot-as-mqtt-cn4.eniot.io", 11883);
-//    private static final Endpoint SERVER = new Endpoint("10.27.20.52", 11883);
+public class RawMqttClientApp {
+//    private static final EndPoint SERVER = new EndPoint("beta-iot-as-mqtt-cn4.eniot.io", 11883);
+    private static final EndPoint SERVER = new EndPoint("10.27.20.52", 11883);
 
     public static void main(String[] args) throws Exception {
         final ClientManager mgr = new ClientManager(0, pipeline -> {
@@ -48,13 +45,13 @@ public class MqttClientApp {
             });
         });
 
-//        // 1.0 beta
-//        ByteBuf data = getConnMsg(
-//                "enos-7zrJzjQCrqf3R9S",
-//                "dev01",
-//                "oMmI512lia+D9bNMsv8DVgR5MOniIGLJd8dCLvY9a5ngPI1PJ+TLFpCDasg=");
+        // 1.0 beta
+        ByteBuf data = getConnMsg(
+                "will-dev03",
+                "dev03",
+                "DWXD/9yhn2Mv4nsBcsUL8h3Rvq4xK/zud1uuxE9On5iRuIZvKvQdV/5nv2M=");
 
-        mgr.sendMessage(SERVER, getPublishMsg("/sys/pk/dk/thing/event/measurepoint/post", "dos", 0)).addListener(new GenericFutureListener<Future<? super Boolean>>() {
+        mgr.sendMessage(SERVER, data).addListener(new GenericFutureListener<Future<? super Boolean>>() {
             @Override
             public void operationComplete(Future<? super Boolean> future) throws Exception {
                 if (future.isSuccess()) {

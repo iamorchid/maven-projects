@@ -27,7 +27,7 @@ public class Client {
                     }
                 }
         ));
-        EndPoint address = new EndPoint("localhost", 33333);
+        EndPoint address = new EndPoint("10.5.66.37", 33333);
 
         sendMessage(manager, address);
 
