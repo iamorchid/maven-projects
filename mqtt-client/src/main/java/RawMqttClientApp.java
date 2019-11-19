@@ -13,8 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 public class RawMqttClientApp {
-//    private static final EndPoint SERVER = new EndPoint("beta-iot-as-mqtt-cn4.eniot.io", 11883);
-    private static final EndPoint SERVER = new EndPoint("10.27.20.52", 11883);
 
     public static void main(String[] args) throws Exception {
         final ClientManager mgr = new ClientManager(0, pipeline -> {
@@ -45,13 +43,21 @@ public class RawMqttClientApp {
             });
         });
 
+  /*
         // 1.0 beta
+        EndPoint server = new EndPoint("10.27.20.52", 11883);
         ByteBuf data = getConnMsg(
                 "will-dev03",
                 "dev03",
                 "DWXD/9yhn2Mv4nsBcsUL8h3Rvq4xK/zud1uuxE9On5iRuIZvKvQdV/5nv2M=");
-
-        mgr.sendMessage(SERVER, data).addListener(new GenericFutureListener<Future<? super Boolean>>() {
+*/
+        // 2.0 beta
+        EndPoint server = new EndPoint("localhost", 11883);
+        ByteBuf data = getConnMsg(
+                "mqtt-sample-subdev02|securemode=2,signmethod=sha256,timestamp=1574143977891|",
+                "mqtt-sample-subdev02&gvQGUcaT",
+                "2c7b8002bcd7e675494f3a6fcbf94a4801dc18566e2da9bfe994e6f05a5f80fb");
+        mgr.sendMessage(server, data).addListener(new GenericFutureListener<Future<? super Boolean>>() {
             @Override
             public void operationComplete(Future<? super Boolean> future) throws Exception {
                 if (future.isSuccess()) {
@@ -65,7 +71,7 @@ public class RawMqttClientApp {
         System.in.read();
 
 
-        mgr.sendMessage(SERVER, getDisconnMsg()).addListener(new GenericFutureListener<Future<? super Boolean>>() {
+        mgr.sendMessage(server, getDisconnMsg()).addListener(new GenericFutureListener<Future<? super Boolean>>() {
             @Override
             public void operationComplete(Future<? super Boolean> future) throws Exception {
                 if (future.isSuccess()) {
@@ -95,8 +101,8 @@ public class RawMqttClientApp {
         variableBuf.writeByte(0xC0);
 
         // Keep Alive (60s)
-        variableBuf.writeByte(0xFF);
-        variableBuf.writeByte(0xFF);
+        variableBuf.writeByte(0x00);
+        variableBuf.writeByte(0x0a);
 
         // Client ID
         populateString(variableBuf, clientId);
