@@ -7,6 +7,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.ResponseContentEncoding;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
@@ -24,6 +25,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 public class HttpAsyncClientTest {
 
@@ -47,19 +49,21 @@ public class HttpAsyncClientTest {
         final CloseableHttpAsyncClient client = HttpAsyncClients.custom().
                 setConnectionManager(connManager)
                 .setDefaultRequestConfig(requestConfig)
+                .addInterceptorLast(new ResponseContentEncoding())
                 .build();
 
         //start
         client.start();
 
-        List<NameValuePair> tokenParams = new ArrayList<>(5);
-        tokenParams.add(new BasicNameValuePair("env", "beta"));
-        tokenParams.add(new BasicNameValuePair("keys",
-                "iot-mqtt-broker.measurepoint.topic,iot-mqtt-broker.bull.name"));
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(tokenParams, Consts.UTF_8);
-        HttpGet get = new HttpGet("http://10.27.20.20:8090/config2/get?" + EntityUtils.toString(entity));
+//        List<NameValuePair> tokenParams = new ArrayList<>(5);
+//        tokenParams.add(new BasicNameValuePair("env", "beta"));
+//        tokenParams.add(new BasicNameValuePair("keys",
+//                "iot-mqtt-broker.measurepoint.topic,iot-mqtt-broker.bull.name"));
+//        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(tokenParams, Consts.UTF_8);
+//        HttpGet get = new HttpGet("http://10.27.20.20:8090/config2/get?" + EntityUtils.toString(entity));
 
-        client.execute(get, new CallBack());
+        HttpGet get = new HttpGet("http://localhost:2080/");
+        client.execute(get, new CallBack()).get();
 
         System.out.println("print any key to exit ...");
         System.in.read();
@@ -72,12 +76,16 @@ public class HttpAsyncClientTest {
         public void completed(HttpResponse httpResponse) {
             try {
                 HttpEntity rspEntity = httpResponse.getEntity();
-                Gson gson = new GsonBuilder().create();
-                ContentType contentType = ContentType.getOrDefault(rspEntity);
-                Charset charset = contentType.getCharset();
-                try (Reader reader = new InputStreamReader(rspEntity.getContent(), charset)) {
-                    System.out.println("received: \n" + gson.fromJson(reader, Map.class));
-                }
+//                Gson gson = new GsonBuilder().create();
+//                ContentType contentType = ContentType.getOrDefault(rspEntity);
+//                Charset charset = contentType.getCharset();
+//                try (Reader reader = new InputStreamReader(rspEntity.getContent(), charset)) {
+//                    System.out.println("received: \n" + gson.fromJson(reader, Map.class));
+//                }
+                System.out.println(rspEntity.getContentLength());
+                byte[] data = new byte[1024];
+                int length = new GZIPInputStream(rspEntity.getContent()).read(data);
+                System.out.println(new String(data, 0, length));
             } catch (Exception e) {
                 System.err.println("captured error: " + e.getMessage());
             }
