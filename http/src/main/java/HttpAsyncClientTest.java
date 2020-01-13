@@ -7,6 +7,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.ResponseContentEncoding;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.ContentType;
@@ -44,7 +45,7 @@ public class HttpAsyncClientTest {
         ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor(ioReactorConfig);
         PoolingNHttpClientConnectionManager connManager = new PoolingNHttpClientConnectionManager(ioReactor);
         connManager.setMaxTotal(100);
-        connManager.setDefaultMaxPerRoute(100);
+        connManager.setDefaultMaxPerRoute(3);
 
         final CloseableHttpAsyncClient client = HttpAsyncClients.custom().
                 setConnectionManager(connManager)
@@ -55,15 +56,20 @@ public class HttpAsyncClientTest {
         //start
         client.start();
 
-//        List<NameValuePair> tokenParams = new ArrayList<>(5);
-//        tokenParams.add(new BasicNameValuePair("env", "beta"));
-//        tokenParams.add(new BasicNameValuePair("keys",
-//                "iot-mqtt-broker.measurepoint.topic,iot-mqtt-broker.bull.name"));
-//        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(tokenParams, Consts.UTF_8);
+        List<NameValuePair> tokenParams = new ArrayList<>(5);
+        tokenParams.add(new BasicNameValuePair("env", "beta"));
+        tokenParams.add(new BasicNameValuePair("keys",
+                "iot-mqtt-broker.measurepoint.topic,iot-mqtt-broker.bull.name"));
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(tokenParams, Consts.UTF_8);
 //        HttpGet get = new HttpGet("http://10.27.20.20:8090/config2/get?" + EntityUtils.toString(entity));
 
-        HttpGet get = new HttpGet("http://localhost:2080/");
-        client.execute(get, new CallBack()).get();
+//        HttpGet get = new HttpGet("http://localhost:2080/");
+//        client.execute(get, new CallBack()).get();
+
+        HttpPost post = new HttpPost("http://localhost:2080/");
+        post.setEntity(entity);
+        client.execute(post, new CallBack()).get();
+
 
         System.out.println("print any key to exit ...");
         System.in.read();
