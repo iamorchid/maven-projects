@@ -28,6 +28,7 @@
         <module>lucene</module>
         <module>mqtt-client</module>
         <module>quartz</module>
+        <module>micrometer</module>
     </modules>
 
     <build>
