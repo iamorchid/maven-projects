@@ -47,10 +47,10 @@ public class HttpAsyncClientTest {
         connManager.setMaxTotal(100);
         connManager.setDefaultMaxPerRoute(3);
 
-        final CloseableHttpAsyncClient client = HttpAsyncClients.custom().
-                setConnectionManager(connManager)
+        final CloseableHttpAsyncClient client = HttpAsyncClients.custom()
+                .setConnectionManager(connManager)
                 .setDefaultRequestConfig(requestConfig)
-                .addInterceptorLast(new ResponseContentEncoding())
+//                .addInterceptorLast(new ResponseContentEncoding())
                 .build();
 
         //start

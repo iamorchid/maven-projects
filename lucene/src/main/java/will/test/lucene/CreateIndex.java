@@ -64,7 +64,6 @@ public class CreateIndex {
             }
         });
 
-
         IndexWriter writer = new IndexWriter(indexDir, indexWriterConfig);
         IndexReader reader = DirectoryReader.open(writer);
 

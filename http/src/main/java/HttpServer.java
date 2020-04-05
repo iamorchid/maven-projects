@@ -20,7 +20,7 @@ public class HttpServer {
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             OutputStream os = new GZIPOutputStream(baos);
-            os.write(("<div>Hello, World! I am Will and now is " + new Date() + ", random is " + new Random().nextInt() + ".<div>.")
+            os.write(("<div>Hello, World! I am Will and now is " + new Date() + ", random is " + new Random().nextInt() + ".<div>")
                     .getBytes("UTF-8"));
             os.close();
 
