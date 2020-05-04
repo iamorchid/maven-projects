@@ -39,7 +39,7 @@ public class KafkaReader {
             while(true) {
                 try {
                     ConsumerRecord<String, String> record = queue.take();
-                    System.out.println(record.value());
+                    System.out.println("record: \n" + record.offset() + ": " + record.value());
 //                    RuleEngineMsg msg = gson.fromJson(record.value(), RuleEngineMsg.class);
 //                    if (Objects.equals(msg.getOrgId(), "o15475450989191")) {
 //                        Map<String, Object> payload = (Map<String, Object>)msg.getPayload();
@@ -58,7 +58,7 @@ public class KafkaReader {
 
         final List<TopicPartition> partitions = new LinkedList<>();
 
-        String topic = "MQTT_ALERT_POST_TOPIC";
+        String topic = "MEASURE_POINT_ORIGIN_OFFLINE_o15535059999891";
         consumer.subscribe(Arrays.asList(topic), new ConsumerRebalanceListener() {
 //        consumer.subscribe(Pattern.compile("MEASURE_POINT_CAL_(?!OFFLINE).*"), new ConsumerRebalanceListener() {
             @Override
@@ -68,18 +68,15 @@ public class KafkaReader {
 
             @Override
             public void onPartitionsAssigned(Collection<TopicPartition> assignedPartitions) {
-                for(TopicPartition partition : assignedPartitions) {
-                    System.out.println("onPartitionsAssigned: " + partition);
-                    consumer.seek(partition, 0);
-                    partitions.add(partition);
-                }
+                System.out.println("onPartitionsAssigned: " + assignedPartitions);
+//                consumer.seekToEnd(assignedPartitions);
             }
         });
 
 
 
         while(true) {
-            ConsumerRecords<String, String> result = consumer.poll(Duration.ofMillis(200));
+            ConsumerRecords<String, String> result = consumer.poll(Duration.ofMillis(500));
             if (result != null && !result.isEmpty()) {
                 System.out.println("fetch record count: " + result.count());
 

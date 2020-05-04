@@ -29,6 +29,8 @@
         <module>mqtt-client</module>
         <module>quartz</module>
         <module>micrometer</module>
+        <module>resilience4j</module>
+        <module>java</module>
     </modules>
 
     <build>
