@@ -31,6 +31,7 @@
         <module>micrometer</module>
         <module>resilience4j</module>
         <module>java</module>
+        <module>master-slave</module>
     </modules>
 
     <build>
