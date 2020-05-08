@@ -26,6 +26,12 @@ public class ServerPipelineInitializer implements PipelineInitializer {
                 // echo back the message
                 ctx.channel().writeAndFlush(msg);
             }
+
+            @Override
+            public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+                super.handlerRemoved(ctx);
+                LOG.info("context removed");
+            }
         });
         pipeline.addLast("stringEncoder", new LineEncoder(CharsetUtil.UTF_8));
     }
