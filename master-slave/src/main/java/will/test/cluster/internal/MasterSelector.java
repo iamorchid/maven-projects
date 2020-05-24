@@ -53,12 +53,12 @@ public class MasterSelector {
         final MasterInfo persistedMaster = config.getLockImpl().getMaster(config.getClusterId());
 
         if (persistedMaster != null) {
-            log.info("found persisted master {}", persistedMaster.getGlobalId(config.getClusterId()));
+            log.debug("found persisted master {}", persistedMaster.getGlobalId(config.getClusterId()));
 
             // We need to destroy local started master if the mastership has transferred
             if (master != null) {
                 if (persistedMaster.equals(master.getSelfInfo())) {
-                    log.info("local host has already been the master for [{}]", config.getClusterId());
+                    log.debug("local host has already been the master for [{}]", config.getClusterId());
                     return CompletableFuture.completedFuture(master.getSelfInfo());
                 }
 
@@ -69,7 +69,7 @@ public class MasterSelector {
             return CompletableFuture.completedFuture(persistedMaster);
         }
 
-        log.info("found no persistent master, try becoming the master of cluster [{}]", config.getClusterId());
+        log.debug("found no persistent master, try becoming the master of cluster [{}]", config.getClusterId());
 
         // Since we need some time to start master node, we need somewhat longer expire time
         final long masterTerm = config.getLockImpl().incrMasterTerm(config.getClusterId());
@@ -81,7 +81,7 @@ public class MasterSelector {
             return doSelect();
         }
 
-        log.info("local host has become the master of cluster [{}]", config.getClusterId());
+        log.debug("local host has become the master of cluster [{}]", config.getClusterId());
 
         if (master != null) {
             // This means the master has not refresh its persistent time within the expire time.

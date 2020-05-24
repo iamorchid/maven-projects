@@ -2,30 +2,9 @@ package will.test.quartz;
 
 import org.quartz.*;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
-import static org.quartz.JobBuilder.newJob;
-
-class Student {
-    private final int age;
-    private final String name;
-
-    public Student(int age, String name) {
-        this.age = age;
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public String getName() {
-        return name;
-    }
-}
 
 public class Main {
 
@@ -38,18 +17,19 @@ public class Main {
 
         // define the job and tie it to our HelloJob class
         JobDetail job = newJob(HelloJob.class)
+                .usingJobData("name", "Will Zhang")
                 .withIdentity("myJob-" + 0, "group1")
                 .build();
 
         long now = System.currentTimeMillis();
-        long elapsedMSInMin = now % (1000*60);
-        int leftMSInMin = (int) (1000 * 60 - elapsedMSInMin);
-        System.out.println("left MS: " + leftMSInMin);
+        long elapsedMillis = now % (1000 * 60);
+        int remainingMillis = (int) (1000 * 60 - elapsedMillis);
+        System.out.println("remaining millis: " + remainingMillis);
 
         // Trigger the job to run now, and then every 40 seconds
         Trigger trigger = newTrigger()
                 .withIdentity("myTrigger-" + 0, "group1")
-                .startAt(DateBuilder.futureDate(leftMSInMin, DateBuilder.IntervalUnit.MILLISECOND))
+                .startAt(DateBuilder.futureDate(remainingMillis, DateBuilder.IntervalUnit.MILLISECOND))
                 .withSchedule(simpleSchedule()
                         .withIntervalInSeconds(60)
                         .repeatForever())
@@ -58,14 +38,19 @@ public class Main {
         // Tell quartz to schedule the job using our trigger
         sched.scheduleJob(job, trigger);
 
+        // Trigger the job to run now, and then every 40 seconds
+        trigger = newTrigger()
+                .withIdentity("myTrigger-" + 1, "group1")
+                .startAt(DateBuilder.futureDate(remainingMillis + 5000, DateBuilder.IntervalUnit.MILLISECOND))
+                .withSchedule(simpleSchedule()
+                        .withIntervalInSeconds(60)
+                        .repeatForever())
+                .forJob(job.getKey())
+                .build();
 
-        List<Student> students = new LinkedList<>();
-        for (int i = 0; i < 1024 * 1024; i++) {
-            students.add(new Student(i, "name" + i));
-        }
-
+        // Tell quartz to schedule the job using our trigger
+        sched.scheduleJob(trigger);
 
         System.in.read();
-        System.exit(-1);
     }
 }
