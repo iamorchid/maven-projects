@@ -1,24 +1,24 @@
 package will.test.quartz;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import lombok.extern.slf4j.Slf4j;
+import org.quartz.*;
 
 import java.io.Serializable;
-import java.util.Date;
 
+@Slf4j
+@PersistJobDataAfterExecution
+@DisallowConcurrentExecution
 public class HelloJob implements Job, Serializable {
-
-    @Getter @Setter
-    private String name;
 
     @Override
     public void execute(JobExecutionContext context) {
-        System.out.println("date: " + new Date());
-        System.out.println("jobKey: " + context.getJobDetail().getKey());
-        System.out.println("trigger: " + context.getTrigger().getKey());
+        JobDataMap map = context.getJobDetail().getJobDataMap();
+
+        log.info("[{}][{}]: name={}, count={}",
+                context.getJobDetail().getKey(), context.getTrigger().getKey(),
+                map.get("name"), map.get("count"));
+
+        context.getJobDetail().getJobDataMap().put("count", map.getIntValue("count") + 1);
     }
 
 }
