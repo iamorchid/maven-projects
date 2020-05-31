@@ -32,6 +32,8 @@
         <module>resilience4j</module>
         <module>java</module>
         <module>master-slave</module>
+        <module>graal</module>
+        <module>dubbo-test</module>
     </modules>
 
     <build>
