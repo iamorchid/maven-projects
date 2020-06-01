@@ -10,9 +10,9 @@ import java.util.List;
 @DubboService(
         version = "1.0.0",
         group = "will",
-//        parameters = "{}",
+        parameters = {"param1", "key1", "param2", "key2"},
         methods = {
-                @Method(name = "books", timeout = 250, retries = 0)
+                @Method(name = "books", timeout = 5000, retries = 3)
         }
 )
 public class BookStoreService implements IBookStore {
