@@ -1,11 +1,13 @@
 package will.test.dubbo.service.impl;
 
+import lombok.SneakyThrows;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Method;
 import will.test.dubbo.service.api.IBookStore;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @DubboService(
         version = "1.0.0",
@@ -17,11 +19,15 @@ import java.util.List;
 )
 public class BookStoreService implements IBookStore {
 
+    @SneakyThrows
     @Override
-    public List<String> books() {
-        return Arrays.asList("Linux", "Network", "Mysql", "Dubbo", "Spring", "Redis", "Kafka", "Elastic Search", "Netty");
+    public CompletableFuture<List<String>> books() {
+        CompletableFuture<List<String>> complete = new CompletableFuture<>();
+        complete.complete(Arrays.asList("Linux", "Network", "Mysql", "Dubbo", "Spring", "Redis", "Kafka", "Elastic Search", "Netty"));
+        return complete;
     }
 
+    @SneakyThrows
     @Override
     public List<String> getBestSellers() {
         return Arrays.asList("Linux", "Network", "Mysql");
