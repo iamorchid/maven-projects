@@ -14,13 +14,13 @@ public class Main {
             StatementResult result0 = tx.run("match (n: Node) return n");
             log.info("result1: {}", result0.list());
 
-            tx.run("create (n:Node{department: \"FID\", role:\"ED\", name: \"alex\"})");
+//            tx.run("create (n:Node{department: \"FID\", role:\"ED\", name: \"alex\"})");
             StatementResult result1 = tx.run("match (n: Node) return n");
             log.info("result1: {}", result1.list());
 
-            tx.run("create (n:Node{department: \"FID\", role:\"VP\", name: \"boz\"})");
-            StatementResult result2 = tx.run("match (n: Node) return n");
-            log.info("result2: {}", result2.list());
+//            tx.run("create (n:Node{department: \"FID\", role:\"VP\", name: \"boz\"})");
+//            StatementResult result2 = tx.run("match (n: Node) return n");
+//            log.info("result2: {}", result2.list());
 
             tx.failure();
         }

@@ -3,8 +3,9 @@ package will.test.morphia;
 import com.mongodb.*;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
+import will.test.morphia.data.Employee;
 
-public class Main {
+public class MorphiaTest {
 
     public static void main(String[] args) {
         betaTest();
