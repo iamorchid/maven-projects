@@ -1,9 +1,9 @@
-package will.test.morphia;
+package will.test.mongo.sync;
 
 import com.mongodb.*;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
-import will.test.morphia.data.Employee;
+import will.test.mongo.sync.data.Employee;
 
 public class MorphiaTest {
 

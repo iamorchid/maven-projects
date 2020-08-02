@@ -1,4 +1,4 @@
-package will.test.morphia.data;
+package will.test.mongo.sync.data;
 
 //import dev.morphia.annotations.*;
 //import org.bson.types.ObjectId;

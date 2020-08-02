@@ -18,7 +18,7 @@ public class Main {
         Scheduler sched = schedFact.getScheduler();
         sched.start();
 
-        sched.pauseJob("");
+        sched.pauseJob(JobKey.jobKey(""));
 
         JobKey jobKey = JobKey.jobKey("job#0", "group#1");
 
