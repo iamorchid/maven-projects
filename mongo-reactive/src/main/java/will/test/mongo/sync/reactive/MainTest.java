@@ -1,5 +1,6 @@
 package will.test.mongo.sync.reactive;
 
+import com.mongodb.ClientSessionOptions;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ReadPreference;
@@ -35,7 +36,8 @@ public class MainTest {
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        mongoClient.startSession().subscribe(new Subscriber<ClientSession>() {
+        ClientSessionOptions options = ClientSessionOptions.builder().causallyConsistent(true).build();
+        mongoClient.startSession(options).subscribe(new Subscriber<ClientSession>() {
             @Override
             public void onSubscribe(Subscription s) {
                 System.out.println("onSubscribe");
