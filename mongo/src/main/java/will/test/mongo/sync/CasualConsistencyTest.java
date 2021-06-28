@@ -82,6 +82,7 @@ public class CasualConsistencyTest {
         session1.startTransaction(TransactionOptions.builder()
                 // 显式开启TX时，必须使用primary read preference
                 .readPreference(ReadPreference.primary())
+                // 决定事务提交时的acknowledgment
                 .writeConcern(WriteConcern.W1)
                 // 这有没有可能读取不到同一个事务中的上一次写操作（比如写操作还没有同步到majority）？但事务没有
                 // 提交之前，又怎么可能同步到其他的replicas呢？因此，我的理解是，同一个事务中，读取操作总是能

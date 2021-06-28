@@ -24,6 +24,10 @@ import will.test.mongo.sync.reactive.data.ClassInfo;
 
 import java.util.Date;
 
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+
 @Component
 public class SyncDataService implements CommandLineRunner {
 
@@ -124,7 +128,7 @@ public class SyncDataService implements CommandLineRunner {
         Flux<ChangeStreamEvent<Document>> changeStreamEventFlux = reactiveTemplate.changeStream(
                 "class",
                 ChangeStreamOptions.builder()
-//                        .filter(newAggregation(match(where("operationType").is("insert"))))
+                        .filter(newAggregation(match(where("operationType").is("insert"))))
                         // invalidate event之前的某个token
                         .resumeAfter(BsonDocument.parse("{\"_data\": \"825F266303000000012B022C0100296E5A100432BBB7147D7E4EE39D29C3B1A34CAD5746645F696400645F266303FF7E423EBC0E41FB0004\"}"))
 //                        // 下面的token指向某个invalidate event（如drop当前被watched collection）
