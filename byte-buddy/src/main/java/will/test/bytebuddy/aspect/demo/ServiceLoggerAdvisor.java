@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ServiceLoggerAdvisor {
     /**
      * This can only be public as byte-buddy copies the aspect related code to
-     * generated class.
+     * generated class (namely using in-line way).
      */
     public static AtomicInteger STATS = new AtomicInteger();
 
