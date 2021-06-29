@@ -1,6 +1,6 @@
 package will.test.bytebuddy.delegation;
 
-import net.bytebuddy.implementation.bind.annotation.Super;
+import net.bytebuddy.implementation.bind.annotation.This;
 
 public class Target {
 
@@ -9,7 +9,7 @@ public class Target {
 //        return "hello, " + name + "!";
 //    }
 
-    public static String hello(int age, String name) {
+    public static String hello(int age, String name, @This Object thisObj) {
         return "hello, " + name + ", you are " + age + " years old!";
     }
 

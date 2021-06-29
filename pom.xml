@@ -37,6 +37,7 @@
         <module>neo4j-test</module>
         <module>mongo-reactive</module>
         <module>byte-buddy</module>
+        <module>java-agent</module>
     </modules>
 
     <build>

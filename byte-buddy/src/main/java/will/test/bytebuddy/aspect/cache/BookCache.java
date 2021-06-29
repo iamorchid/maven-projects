@@ -15,7 +15,8 @@ public class BookCache {
     public final static Map<String, Book> CACHE = new ConcurrentHashMap<>();
 
     @Advice.OnMethodEnter(skipOn = Advice.OnNonDefaultValue.class)
-    public static Book beforeGetBook(@Advice.Argument(0) String bookName) {
+    public static Book beforeGetBook(@Advice.Argument(0) String bookName,
+                                     @Advice.Origin(value = "#m") Object method) {
         return CACHE.get(bookName);
     }
 

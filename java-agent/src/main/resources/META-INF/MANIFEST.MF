@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Built-By: jian.zhang4
+Premain-Class: will.test.javaagent.WillTestAgent
+Can-Redefine-Classes: true
+Can-Retransform-Classes: true

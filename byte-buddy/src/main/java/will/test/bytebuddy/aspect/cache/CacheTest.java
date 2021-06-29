@@ -28,6 +28,7 @@ public class CacheTest {
                 .newInstance();
 
         System.out.println(bookStore.get("ULK") == bookStore.get("ULK"));
+
     }
 
 }
