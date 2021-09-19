@@ -1,23 +1,17 @@
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.regex.Pattern;
 
 public class KafkaReader {
-
-    private static Gson gson = new GsonBuilder()
-            .disableHtmlEscaping()
-            .create();
 
     public static void main(String[] args) {
         Properties kafkaProps = new Properties();
@@ -27,36 +21,20 @@ public class KafkaReader {
         kafkaProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         kafkaProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
-        KafkaConsumer consumer = new KafkaConsumer<>(kafkaProps);
-
-
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaProps);
         BlockingQueue<ConsumerRecord<String, String>> queue = new LinkedBlockingQueue<>();
-        boolean paused = false;
 
         Thread thread = new Thread(() -> {
             while(true) {
                 try {
                     ConsumerRecord<String, String> record = queue.take();
                     System.out.println("record: \n" + record.offset() + ": " + record.value());
-//                    RuleEngineMsg msg = gson.fromJson(record.value(), RuleEngineMsg.class);
-//                    if (Objects.equals(msg.getOrgId(), "o15475450989191")) {
-//                        Map<String, Object> payload = (Map<String, Object>)msg.getPayload();
-//                        if (Objects.equals("EGCAf4Ar", payload.get("assetId"))) {
-//                            double obj = (Double)payload.get("time");
-//                            System.out.println(msg.getPayload() + ", local-time: " + format.format(new Date(((long)obj))));
-//                        }
-//                    }
                 } catch (Exception e) {
                     e.getMessage();
                 }
             }
         });
         thread.start();
-
-
-        final List<TopicPartition> partitions = new LinkedList<>();
 
         String topic = "MEASURE_POINT_ORIGIN_OFFLINE_o15535059999891";
         consumer.subscribe(Arrays.asList(topic), new ConsumerRebalanceListener() {
@@ -72,8 +50,6 @@ public class KafkaReader {
 //                consumer.seekToEnd(assignedPartitions);
             }
         });
-
-
 
         while(true) {
             ConsumerRecords<String, String> result = consumer.poll(Duration.ofMillis(500));

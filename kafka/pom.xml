@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <kafka.client.version>2.3.0</kafka.client.version>
+        <kafka.client.version>2.8.0</kafka.client.version>
     </properties>
 
     <artifactId>kafka</artifactId>

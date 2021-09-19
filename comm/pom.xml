@@ -47,12 +47,6 @@
             <artifactId>commons-lang</artifactId>
             <version>2.6</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.envisioniot.enos</groupId>
-            <artifactId>enos-commons</artifactId>
-            <version>0.1.6-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
 </project>
