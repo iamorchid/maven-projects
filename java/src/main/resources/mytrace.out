@@ -1,0 +1,50 @@
+now sleep 10 seconds
+----------mytrace (tid: 70127)----------
+./consumer(+0x14475d) [0x5583f442b75d]
+./consumer(+0x788fd) [0x5583f435f8fd]
+./consumer(+0xc7a8a) [0x5583f43aea8a]
+./consumer(+0xc7b29) [0x5583f43aeb29]
+./consumer(+0x2d1cb) [0x5583f43141cb]
+./consumer(+0x5869c) [0x5583f433f69c]
+./consumer(+0x31b3f) [0x5583f4318b3f]
+./consumer(+0x563e8) [0x5583f433d3e8]
+./consumer(+0x56f7c) [0x5583f433df7c]
+./consumer(+0x3e03a) [0x5583f432503a]
+./consumer(+0x3e8d2) [0x5583f43258d2]
+./consumer(+0x3ffd3) [0x5583f4326fd3]
+./consumer(+0x4044d) [0x5583f432744d]
+/lib/x86_64-linux-gnu/libpthread.so.0(+0x96da) [0x7fccf3ad36da]
+/lib/x86_64-linux-gnu/libc.so.6(clone+0x43) [0x7fccf39f8293]
+----------mytrace (tid: 70124)----------
+./consumer(+0x14475d) [0x5583f442b75d]
+./consumer(+0x788fd) [0x5583f435f8fd]
+./consumer(+0xc7a8a) [0x5583f43aea8a]
+./consumer(+0xc7b29) [0x5583f43aeb29]
+./consumer(+0x2d1cb) [0x5583f43141cb]
+./consumer(+0x5869c) [0x5583f433f69c]
+./consumer(+0x31b3f) [0x5583f4318b3f]
+./consumer(+0x563e8) [0x5583f433d3e8]
+./consumer(+0x56f7c) [0x5583f433df7c]
+./consumer(+0x3e03a) [0x5583f432503a]
+./consumer(+0x3e8d2) [0x5583f43258d2]
+./consumer(+0x3ffd3) [0x5583f4326fd3]
+./consumer(+0x4044d) [0x5583f432744d]
+/lib/x86_64-linux-gnu/libpthread.so.0(+0x96da) [0x7fccf3ad36da]
+/lib/x86_64-linux-gnu/libc.so.6(clone+0x43) [0x7fccf39f8293]
+assign topics
+----------mytrace (tid: 70125)----------
+./consumer(+0x14475d) [0x5583f442b75d]
+./consumer(+0x788fd) [0x5583f435f8fd]
+./consumer(+0xc727c) [0x5583f43ae27c]
+./consumer(+0x4a153) [0x5583f4331153]
+./consumer(+0x123da) [0x5583f42f93da]
+./consumer(+0x513fd) [0x5583f43383fd]
+./consumer(+0x21647) [0x5583f4308647]
+/lib/x86_64-linux-gnu/libpthread.so.0(+0x96da) [0x7fccf3ad36da]
+/lib/x86_64-linux-gnu/libc.so.6(clone+0x43) [0x7fccf39f8293]
+Message on test-data [1] at offset 3:
+ Value: message3
+Message on test-data [3] at offset 3:
+ Value: msg3
+Message on test-data [3] at offset 4:
+ Value: exit

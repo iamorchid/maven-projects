@@ -3,10 +3,11 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -15,11 +16,11 @@ public class KafkaReader {
 
     public static void main(String[] args) {
         Properties kafkaProps = new Properties();
-        kafkaProps.put("bootstrap.servers", "kafka9001.eniot.io:9092,kafka9002.eniot.io:9092");
+        kafkaProps.put("bootstrap.servers", "localhost:9092");
         kafkaProps.put("group.id", "dev-will");
         kafkaProps.put("enable.auto.commit", "true");
-        kafkaProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        kafkaProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        kafkaProps.put("key.deserializer", StringDeserializer.class.getName());
+        kafkaProps.put("value.deserializer", StringDeserializer.class.getName());
 
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaProps);
         BlockingQueue<ConsumerRecord<String, String>> queue = new LinkedBlockingQueue<>();
@@ -27,8 +28,8 @@ public class KafkaReader {
         Thread thread = new Thread(() -> {
             while(true) {
                 try {
-                    ConsumerRecord<String, String> record = queue.take();
-                    System.out.println("record: \n" + record.offset() + ": " + record.value());
+                    ConsumerRecord<String, String> r = queue.take();
+                    System.out.println("partition: " + r.partition() + ", offset: " + r.offset() + ", value: " + r.value());
                 } catch (Exception e) {
                     e.getMessage();
                 }
@@ -36,9 +37,8 @@ public class KafkaReader {
         });
         thread.start();
 
-        String topic = "MEASURE_POINT_ORIGIN_OFFLINE_o15535059999891";
-        consumer.subscribe(Arrays.asList(topic), new ConsumerRebalanceListener() {
-//        consumer.subscribe(Pattern.compile("MEASURE_POINT_CAL_(?!OFFLINE).*"), new ConsumerRebalanceListener() {
+        String topic = "test-data";
+        consumer.subscribe(Collections.singletonList(topic), new ConsumerRebalanceListener() {
             @Override
             public void onPartitionsRevoked(Collection<TopicPartition> revokedPartitions) {
                 System.out.println("onPartitionsRevoked: " + revokedPartitions);
@@ -47,15 +47,12 @@ public class KafkaReader {
             @Override
             public void onPartitionsAssigned(Collection<TopicPartition> assignedPartitions) {
                 System.out.println("onPartitionsAssigned: " + assignedPartitions);
-//                consumer.seekToEnd(assignedPartitions);
             }
         });
 
         while(true) {
-            ConsumerRecords<String, String> result = consumer.poll(Duration.ofMillis(500));
+            ConsumerRecords<String, String> result = consumer.poll(Duration.ofMillis(1000));
             if (result != null && !result.isEmpty()) {
-                System.out.println("fetch record count: " + result.count());
-
                 for (ConsumerRecord<String, String> record : result) {
                     queue.add(record);
                 }
